@@ -1,0 +1,8 @@
+# .idea files
+.idea/
+
+# .DS_Store file
+.DS_Store
+
+# Executable
+image-box-app
