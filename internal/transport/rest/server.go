@@ -17,9 +17,5 @@ func NewServer() *Server {
 }
 
 func (s *Server) Run(addr ...string) error {
-	if len(addr) == 0 {
-		return s.router.Run()
-	}
-
 	return s.router.Run(addr...)
 }
