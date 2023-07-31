@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"
 	"github.com/zenorachi/image-box/pkg/database/postgres"
@@ -12,6 +13,10 @@ type Config struct {
 	}
 
 	DB postgres.DBConfig
+}
+
+func InitENV(filename string) error {
+	return godotenv.Load(filename)
 }
 
 func New(directory, filename string) (*Config, error) {
