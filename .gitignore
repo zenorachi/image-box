@@ -4,5 +4,8 @@
 # .DS_Store file
 .DS_Store
 
+# configs
+.env
+
 # Executable
 image-box-app
