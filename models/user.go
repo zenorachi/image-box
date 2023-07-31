@@ -18,10 +18,11 @@ type User struct {
 	RegisteredAt time.Time `json:"registered_at"`
 }
 
-func CreateUser(email, password string) *User {
-	return &User{
-		Email:    email,
-		Password: password,
+func CreateUser(email, password string) User {
+	return User{
+		Email:        email,
+		Password:     password,
+		RegisteredAt: time.Now(),
 	}
 }
 

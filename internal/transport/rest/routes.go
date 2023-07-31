@@ -2,11 +2,10 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/internal/transport/rest/handlers"
 )
 
-func setupRoutes(router *gin.Engine, handler handlers.Handler) {
-	router.POST("/sign-up", handler.SignUp)
-	router.POST("/sign-in", handler.SignIn)
+func setupRoutes(router *gin.Engine, handler Handler) {
+	router.POST("/sign-up", handler.signUp)
+	router.POST("/sign-in", handler.signIn)
 	//todo: get files, upload file
 }
