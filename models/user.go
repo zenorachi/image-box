@@ -13,13 +13,15 @@ func init() {
 
 type User struct {
 	ID           uint      `json:"id"`
+	Login        string    `json:"login"`
 	Email        string    `json:"email"`
 	Password     string    `json:"password"`
 	RegisteredAt time.Time `json:"registered_at"`
 }
 
-func CreateUser(email, password string) User {
+func CreateUser(login, email, password string) User {
 	return User{
+		Login:        login,
 		Email:        email,
 		Password:     password,
 		RegisteredAt: time.Now(),
@@ -27,8 +29,9 @@ func CreateUser(email, password string) User {
 }
 
 type SignUpInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Login    string `json:"login" validate:"required,gte=6"`
+	Email    string `json:"email" validate:"required,email"`
+	Password string `json:"password" validate:"required,gte=6"`
 }
 
 func (i SignUpInput) Validate() error {
@@ -36,8 +39,8 @@ func (i SignUpInput) Validate() error {
 }
 
 type SignInInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
+	Login    string `json:"login" validate:"required,gte=6"`
+	Password string `json:"password" validate:"required,gte=6"`
 }
 
 func (i SignInInput) Validate() error {

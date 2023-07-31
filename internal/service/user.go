@@ -34,6 +34,6 @@ func (u *Users) SignUp(ctx *gin.Context, input models.SignUpInput) error {
 		return err
 	}
 
-	user := models.CreateUser(input.Email, password)
+	user := models.CreateUser(input.Login, input.Email, password)
 	return u.repository.Create(ctx, user)
 }

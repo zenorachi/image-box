@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 )
@@ -12,10 +12,11 @@ import (
 func (h *handler) signUp(ctx *gin.Context) {
 	//TODO: MIDDLEWARE
 
-	body, err := ioutil.ReadAll(ctx.Request.Body)
+	body, err := io.ReadAll(ctx.Request.Body)
 	if err != nil {
 		log.Println("signUp handler", err)
 		ctx.AbortWithStatus(http.StatusInternalServerError)
+		return
 	}
 
 	var input models.SignUpInput
@@ -25,9 +26,15 @@ func (h *handler) signUp(ctx *gin.Context) {
 		return
 	}
 
+	if err = input.Validate(); err != nil {
+		log.Println("signUp handler", err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
 	if err = h.userService.SignUp(ctx, input); err != nil {
 		log.Println("signUp handler", err)
-		ctx.AbortWithStatus(http.StatusInternalServerError)
+		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 

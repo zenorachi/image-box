@@ -15,9 +15,9 @@ func NewUsers(db *sql.DB) *Users {
 }
 
 func (u *Users) Create(ctx *gin.Context, user models.User) error {
-	_, err := u.db.Exec("INSERT INTO users (email, password, registered_at) "+
-		"VALUES ($1, $2, $3)",
-		user.Email, user.Password, user.RegisteredAt)
+	_, err := u.db.Exec("INSERT INTO users (login, email, password, registered_at) "+
+		"VALUES ($1, $2, $3, $4)",
+		user.Login, user.Email, user.Password, user.RegisteredAt)
 
 	return err
 }
