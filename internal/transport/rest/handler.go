@@ -12,7 +12,7 @@ type User interface {
 
 type AuthHandler interface {
 	signUp(ctx *gin.Context)
-	signIn(ctx *gin.Context)
+	//TODO: signIn(ctx *gin.Context)
 }
 
 type Handler interface {
@@ -20,8 +20,13 @@ type Handler interface {
 	//TODO: FileHandler
 }
 
-type handler struct{}
+type handler struct {
+	userService User
+	//todo fileService File
+}
 
-func New() Handler {
-	return &handler{}
+func NewHandler(users User) Handler {
+	return &handler{
+		userService: users,
+	}
 }

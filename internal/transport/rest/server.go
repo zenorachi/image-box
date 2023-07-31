@@ -9,15 +9,14 @@ type Server struct {
 	handler Handler
 }
 
-func NewServer() *Server {
+func NewServer(h Handler) *Server {
 	router := gin.Default()
-	handler := New()
 
-	setupRoutes(router, handler)
+	setupRoutes(router, h)
 
 	return &Server{
 		router:  router,
-		handler: handler,
+		handler: h,
 	}
 }
 
