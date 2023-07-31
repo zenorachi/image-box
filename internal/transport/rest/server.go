@@ -2,17 +2,23 @@ package rest
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/transport/rest/handlers"
 )
 
 type Server struct {
-	router *gin.Engine
+	router  *gin.Engine
+	handler handlers.Handler
 }
 
 func NewServer() *Server {
-	r := gin.Default()
+	router := gin.Default()
+	handler := handlers.New()
+
+	setupRoutes(router, handler)
 
 	return &Server{
-		router: r,
+		router:  router,
+		handler: handler,
 	}
 }
 
