@@ -8,27 +8,27 @@ import (
 )
 
 func (h *handler) signUp(ctx *gin.Context) {
-	input, exists := ctx.Get("inputData")
+	inputSignUp, exists := ctx.Get("inputSignUp")
 	if !exists {
 		log.Println("signUp handler: inputData not found in context")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	inputData, ok := input.(models.SignUpInput)
+	input, ok := inputSignUp.(models.SignUpInput)
 	if !ok {
 		log.Println("signUp handler: inputData has invalid type")
 		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
-	if err := inputData.Validate(); err != nil {
+	if err := input.Validate(); err != nil {
 		log.Println("signUp handler", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
-	if err := h.userService.SignUp(ctx, inputData); err != nil {
+	if err := h.userService.SignUp(ctx, input); err != nil {
 		log.Println("signUp handler", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
