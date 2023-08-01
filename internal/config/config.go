@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"
@@ -38,7 +37,6 @@ func New(directory, filename string) (*Config, error) {
 	if err := viper.Unmarshal(cfg); err != nil {
 		return nil, err
 	}
-	fmt.Println(cfg.Auth)
 
 	if err := envconfig.Process("db", &cfg.DB); err != nil {
 		return nil, err

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/config"
 	"github.com/zenorachi/image-box/internal/repository"
@@ -10,7 +9,6 @@ import (
 	"github.com/zenorachi/image-box/pkg/database/postgres"
 	"github.com/zenorachi/image-box/pkg/hash"
 	"log"
-	"os"
 )
 
 const (
@@ -31,10 +29,6 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(cfg)
-	fmt.Println(cfg.DB.Host)
-	fmt.Println(os.Getenv("DB_HOST"))
-
 	db, err := postgres.NewDB(cfg.DB)
 	if err != nil {
 		log.Fatalln(err)
@@ -42,7 +36,6 @@ func main() {
 	defer db.Close()
 
 	hasher := hash.NewSHA1Hasher("testLol")
-	fmt.Println(cfg.Auth.TTL)
 
 	usersRepo := repository.NewUsers(db)
 	users := service.NewUsers(hasher, usersRepo, []byte("kekSecret"), cfg.Auth.TTL)
@@ -53,4 +46,5 @@ func main() {
 	if err := s.Run(); err != nil {
 		log.Fatalln(err)
 	}
+	log.Println("Server started")
 }
