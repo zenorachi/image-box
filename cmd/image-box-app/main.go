@@ -10,6 +10,7 @@ import (
 	"github.com/zenorachi/image-box/pkg/database/postgres"
 	"github.com/zenorachi/image-box/pkg/hash"
 	"log"
+	"os"
 )
 
 const (
@@ -31,6 +32,8 @@ func main() {
 	}
 
 	fmt.Println(cfg)
+	fmt.Println(cfg.DB.Host)
+	fmt.Println(os.Getenv("DB_HOST"))
 
 	db, err := postgres.NewDB(cfg.DB)
 	if err != nil {

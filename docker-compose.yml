@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  image-box-app:
+    build: ./
+    command:
+      - ./image-box-app
+    ports:
+      - 80:8080
+    depends_on:
+      - db
+
+  db:
+    restart: always
+    image: postgres:latest
+    ports:
+      - 5436:5432
