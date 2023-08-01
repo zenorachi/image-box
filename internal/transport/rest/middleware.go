@@ -18,14 +18,14 @@ func checkBody() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("requestBody", body)
+		ctx.Set(requestBody, body)
 		ctx.Next()
 	}
 }
 
 func checkJSONSignUp() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		requestBody, _ := ctx.Get("requestBody")
+		requestBody, _ := ctx.Get(requestBody)
 		body := requestBody.([]byte)
 		var input models.SignUpInput
 		if err := json.Unmarshal(body, &input); err != nil {
@@ -34,7 +34,7 @@ func checkJSONSignUp() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("inputSignUp", input)
+		ctx.Set(inputSignUp, input)
 		ctx.Next()
 	}
 }
