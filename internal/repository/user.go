@@ -22,7 +22,11 @@ func (u *Users) Create(ctx *gin.Context, user models.User) error {
 	return err
 }
 
-func (u *Users) GetByCredentials(ctx *gin.Context, email, password string) (error, models.User) {
-	//TODO
-	return nil, models.User{}
+func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (models.User, error) {
+	var user models.User
+	err := u.db.QueryRow("SELECT id, login, password, email, registered_at FROM users "+
+		"WHERE login = $1 AND password = $2", login, password).
+		Scan(&user.ID, &user.Login, &user.Password, &user.Email, &user.RegisteredAt)
+
+	return user, err
 }

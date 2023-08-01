@@ -38,3 +38,19 @@ func checkJSONSignUp() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
+
+func checkJSONSignIn() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		requestBody, _ := ctx.Get(requestBody)
+		body := requestBody.([]byte)
+		var input models.SignInInput
+		if err := json.Unmarshal(body, &input); err != nil {
+			log.Println("signIn middleware", err)
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		ctx.Set(inputSignIn, input)
+		ctx.Next()
+	}
+}

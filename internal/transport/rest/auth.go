@@ -20,7 +20,7 @@ func (h *handler) signUp(ctx *gin.Context) {
 
 	if err := h.userService.SignUp(ctx, input); err != nil {
 		log.Println("signUp handler", err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		ctx.AbortWithStatus(http.StatusInternalServerError)
 		return
 	}
 
@@ -28,5 +28,23 @@ func (h *handler) signUp(ctx *gin.Context) {
 }
 
 func (h *handler) signIn(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, gin.H{"mesSignIn": "ok"})
+	inputSignUp, _ := ctx.Get(inputSignUp)
+
+	input, _ := inputSignUp.(models.SignInInput)
+
+	if err := input.Validate(); err != nil {
+		log.Println("signIn handler", err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	token, err := h.userService.SignIn(ctx, input)
+	if err != nil {
+		log.Println("signIn handler", err)
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{"message": "Sign in successful!",
+		"token": token})
 }

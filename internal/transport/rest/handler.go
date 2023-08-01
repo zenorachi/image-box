@@ -7,17 +7,18 @@ import (
 
 const (
 	inputSignUp = "inputSignUp"
+	inputSignIn = "inputSignIn"
 	requestBody = "requestBody"
 )
 
 type User interface {
 	SignUp(ctx *gin.Context, input models.SignUpInput) error
-	//TODO: SignIn(ctx *gin.Context, input models.SignInInput)
+	SignIn(ctx *gin.Context, input models.SignInInput) (string, error)
 }
 
 type AuthHandler interface {
 	signUp(ctx *gin.Context)
-	//TODO: signIn(ctx *gin.Context)
+	signIn(ctx *gin.Context)
 }
 
 type Handler interface {

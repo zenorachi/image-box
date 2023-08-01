@@ -6,6 +6,6 @@ import (
 
 func setupRoutes(router *gin.Engine, handler Handler) {
 	router.POST("/sign-up", checkBody(), checkJSONSignUp(), handler.signUp)
-	//router.POST("/sign-in", handler.signIn)
+	router.POST("/sign-in", checkBody(), checkJSONSignIn(), handler.signIn)
 	//todo: get files, upload file
 }

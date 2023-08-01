@@ -41,7 +41,7 @@ func main() {
 	hasher := hash.NewSHA1Hasher("testLol")
 
 	usersRepo := repository.NewUsers(db)
-	users := service.NewUsers(hasher, usersRepo, []byte("kek"))
+	users := service.NewUsers(hasher, usersRepo, []byte("kekSecret"))
 
 	handler := rest.NewHandler(users)
 
