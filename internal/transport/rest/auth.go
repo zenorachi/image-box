@@ -8,9 +8,9 @@ import (
 )
 
 func (h *handler) signUp(ctx *gin.Context) {
-	inputSignUp, _ := ctx.Get(inputSignUp)
+	inputBodySignUp, _ := ctx.Get(inputSignUp)
 
-	input, _ := inputSignUp.(models.SignUpInput)
+	input, _ := inputBodySignUp.(models.SignUpInput)
 
 	if err := input.Validate(); err != nil {
 		log.Println("signUp handler", err)
@@ -28,9 +28,9 @@ func (h *handler) signUp(ctx *gin.Context) {
 }
 
 func (h *handler) signIn(ctx *gin.Context) {
-	inputSignUp, _ := ctx.Get(inputSignUp)
+	inputBodySignIn, _ := ctx.Get(inputSignIn)
 
-	input, _ := inputSignUp.(models.SignInInput)
+	input, _ := inputBodySignIn.(models.SignInInput)
 
 	if err := input.Validate(); err != nil {
 		log.Println("signIn handler", err)
