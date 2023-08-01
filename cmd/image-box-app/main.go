@@ -39,9 +39,10 @@ func main() {
 	defer db.Close()
 
 	hasher := hash.NewSHA1Hasher("testLol")
+	fmt.Println(cfg.Auth.TTL)
 
 	usersRepo := repository.NewUsers(db)
-	users := service.NewUsers(hasher, usersRepo, []byte("kekSecret"))
+	users := service.NewUsers(hasher, usersRepo, []byte("kekSecret"), cfg.Auth.TTL)
 
 	handler := rest.NewHandler(users)
 
