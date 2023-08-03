@@ -3,7 +3,7 @@ version: '3.9'
 services:
   image-box-app:
     build: ./
-    command: sleep 300
+    command: sh wait-db.sh db
     ports:
       - "8080:8080"
     depends_on:

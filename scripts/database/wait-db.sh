@@ -10,4 +10,4 @@ until pg_isready -h "$host" -U postgres; do
 done
 
 echo "DB started"
-exec "/dlv exec image-box-app"
+#exec "/dlv exec image-box-app"
