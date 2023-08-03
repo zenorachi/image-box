@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/models"
 	"log"
 	"net/http"
@@ -40,6 +42,9 @@ func (h *handler) signIn(ctx *gin.Context) {
 
 	token, err := h.userService.SignIn(ctx, input)
 	if err != nil {
+		if errors.Is(err, service.UserNotFound) {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "You need to Sign up"})
+		}
 		log.Println("signIn handler", err)
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return

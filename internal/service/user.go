@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var UserNotFound = errors.New("user not found")
+
 type PasswordHasher interface {
 	Hash(password string) (string, error)
 }
@@ -54,7 +56,7 @@ func (u *Users) SignIn(ctx *gin.Context, input models.SignInInput) (string, erro
 	user, err := u.repository.GetByCredentials(ctx, input.Login, password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			// todo
+			return "", UserNotFound
 		}
 		return "", err
 	}

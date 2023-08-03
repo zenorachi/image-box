@@ -1,25 +1,33 @@
 package rest
 
 import (
+	"context"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 type Server struct {
-	router  *gin.Engine
-	handler Handler
+	server *http.Server
 }
 
-func NewServer(h Handler) *Server {
+func NewServer(h Handler, host string, port int) *Server {
 	router := gin.Default()
 
 	setupRoutes(router, h)
 
 	return &Server{
-		router:  router,
-		handler: h,
+		server: &http.Server{
+			Addr:    fmt.Sprintf("%s:%d", host, port),
+			Handler: router,
+		},
 	}
 }
 
-func (s *Server) Run(addr ...string) error {
-	return s.router.Run(addr...)
+func (s *Server) Run() error {
+	return s.server.ListenAndServe()
+}
+
+func (s *Server) Shutdown(ctx context.Context) error {
+	return s.server.Shutdown(ctx)
 }
