@@ -12,14 +12,16 @@ import (
 
 var UserNotFound = errors.New("user not found")
 
-type PasswordHasher interface {
-	Hash(password string) (string, error)
-}
+type (
+	PasswordHasher interface {
+		Hash(password string) (string, error)
+	}
 
-type UserRepository interface {
-	Create(ctx *gin.Context, user models.User) error
-	GetByCredentials(ctx *gin.Context, login, password string) (models.User, error)
-}
+	UserRepository interface {
+		Create(ctx *gin.Context, user models.User) error
+		GetByCredentials(ctx *gin.Context, login, password string) (models.User, error)
+	}
+)
 
 type Users struct {
 	hasher     PasswordHasher
