@@ -3,19 +3,21 @@ version: '3.9'
 services:
   image-box-app:
     build: ./
-    command: sh wait-db.sh db
+    command: sh -c "sh wait-db.sh && ./image-box-app"
     ports:
       - "8080:8080"
+    env_file:
+      - .env
     depends_on:
       - db
 
   db:
     restart: always
     image: postgres:latest
-    environment:
-      POSTGRES_PASSWORD: qwerty
     ports:
         - "5436:5432"
+    env_file:
+      - .env
     volumes:
       - ./scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data
