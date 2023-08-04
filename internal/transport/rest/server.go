@@ -18,14 +18,22 @@ func NewServer(h Handler, host string, port int) *Server {
 	router := gin.Default()
 	mw := middleware.NewMiddleware()
 
-	setupRoutes(router, mw, h)
-
-	return &Server{
+	server := &Server{
 		server: &http.Server{
 			Addr:    fmt.Sprintf("%s:%d", host, port),
 			Handler: router,
 		},
 	}
+
+	server.setupRoutes(router, mw, h)
+
+	return server
+}
+
+func (s *Server) setupRoutes(router *gin.Engine, mw middleware.Middleware, handler Handler) {
+	router.POST("/sign-up", mw.CheckBody(), mw.CheckJSONSignUp(), handler.signUp)
+	router.POST("/sign-in", mw.CheckBody(), mw.CheckJSONSignIn(), handler.signIn)
+	//todo: get files, upload file
 }
 
 func (s *Server) Run() error {
