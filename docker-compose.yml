@@ -1,9 +1,9 @@
 version: '3.9'
 
 services:
-  image-box-app:
+  app:
     build: ./
-    command: sh -c "sh wait-db.sh && ./image-box-app"
+    command: sh -c "sh wait-db.sh && ./app"
     ports:
       - "8080:8080"
     env_file:
