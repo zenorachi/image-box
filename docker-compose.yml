@@ -11,6 +11,16 @@ services:
     depends_on:
       - db
 
+#  minio:
+#    image: minio/minio
+#    command: server /data
+#    ports:
+#      - "9000:9000"
+#    env_file:
+#      - .env
+#    volumes:
+#      - minio_data:/data
+
   db:
     restart: always
     image: postgres:latest
@@ -22,5 +32,10 @@ services:
       - ./scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data
 
+#networks:
+#  mynetwork:
+#    driver: bridge
+
 volumes:
+  minio_data:
   pg_data:
