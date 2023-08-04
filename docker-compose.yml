@@ -10,16 +10,20 @@ services:
       - .env
     depends_on:
       - db
+    networks:
+      - devdzen
 
-#  minio:
-#    image: minio/minio
-#    command: server /data
-#    ports:
-#      - "9000:9000"
-#    env_file:
-#      - .env
-#    volumes:
-#      - minio_data:/data
+  minio:
+    image: minio/minio
+    command: server /data
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    volumes:
+      - minio_data:/data
+    networks:
+      - devdzen
 
   db:
     restart: always
@@ -31,10 +35,12 @@ services:
     volumes:
       - ./scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
       - pg_data:/var/lib/postgresql/data
+    networks:
+      - devdzen
 
-#networks:
-#  mynetwork:
-#    driver: bridge
+networks:
+  devdzen:
+    driver: bridge
 
 volumes:
   minio_data:

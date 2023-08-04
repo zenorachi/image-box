@@ -26,6 +26,6 @@ COPY --from=build /app/scripts/database/wait-db.sh /app/
 # Install psql-client
 RUN apk add --no-cache postgresql-client
 
-# Set permissions to binary
+# Set permissions
 #RUN chmod +x /app/image-box-app
 #RUN chmod +x /app/wait-db.sh

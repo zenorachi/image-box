@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/config"
 	"github.com/zenorachi/image-box/internal/repository"
@@ -50,7 +49,6 @@ func main() {
 	handler := rest.NewHandler(users)
 
 	s := rest.NewServer(handler, cfg.Server.Host, cfg.Server.Port)
-	fmt.Println(cfg)
 
 	go func() {
 		log.Println("Server started")
