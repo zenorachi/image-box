@@ -1,12 +1,12 @@
 .SILENT:
-
-APP = image-box-app
+.DEFAULT_GOAL: build
+.PHONY: build run stop lint
 
 build:
-	docker-compose up --build $(APP)
+	docker-compose up --build
 
 run:
-	docker-compose up $(APP)
+	docker-compose up
 
 stop:
 	docker-compose down
