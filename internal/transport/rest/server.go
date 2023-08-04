@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"net/http"
 )
 
@@ -12,9 +13,12 @@ type Server struct {
 }
 
 func NewServer(h Handler, host string, port int) *Server {
+	//TODO: gin.New() to create custom logger (logrus)
+	//router := gin.New()
 	router := gin.Default()
+	mw := middleware.NewMiddleware()
 
-	setupRoutes(router, h)
+	setupRoutes(router, mw, h)
 
 	return &Server{
 		server: &http.Server{

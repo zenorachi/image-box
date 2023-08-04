@@ -4,13 +4,14 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
+	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/models"
 	"log"
 	"net/http"
 )
 
 func (h *handler) signUp(ctx *gin.Context) {
-	inputBodySignUp, _ := ctx.Get(inputSignUp)
+	inputBodySignUp, _ := ctx.Get(middleware.InputSignUp)
 
 	input, _ := inputBodySignUp.(models.SignUpInput)
 
@@ -30,7 +31,7 @@ func (h *handler) signUp(ctx *gin.Context) {
 }
 
 func (h *handler) signIn(ctx *gin.Context) {
-	inputBodySignIn, _ := ctx.Get(inputSignIn)
+	inputBodySignIn, _ := ctx.Get(middleware.InputSignIn)
 
 	input, _ := inputBodySignIn.(models.SignInInput)
 

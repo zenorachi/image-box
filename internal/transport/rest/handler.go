@@ -5,12 +5,6 @@ import (
 	"github.com/zenorachi/image-box/models"
 )
 
-const (
-	inputSignUp = "inputSignUp"
-	inputSignIn = "inputSignIn"
-	requestBody = "requestBody"
-)
-
 type User interface {
 	SignUp(ctx *gin.Context, input models.SignUpInput) error
 	SignIn(ctx *gin.Context, input models.SignInInput) (string, error)
