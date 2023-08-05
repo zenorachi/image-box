@@ -8,16 +8,24 @@ import (
 type User interface {
 	SignUp(ctx *gin.Context, input models.SignUpInput) error
 	SignIn(ctx *gin.Context, input models.SignInInput) (string, error)
+	ParseToken(ctx *gin.Context, token string) (uint, error)
 }
 
-type AuthHandler interface {
-	signUp(ctx *gin.Context)
-	signIn(ctx *gin.Context)
-}
+type (
+	AuthHandler interface {
+		signUp(ctx *gin.Context)
+		signIn(ctx *gin.Context)
+	}
+
+	FileHandler interface {
+		files(ctx *gin.Context)
+	}
+)
 
 type Handler interface {
+	CheckToken() gin.HandlerFunc
 	AuthHandler
-	//TODO: FileHandler
+	FileHandler
 }
 
 type handler struct {

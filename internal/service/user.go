@@ -3,6 +3,7 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/zenorachi/image-box/models"
@@ -70,4 +71,40 @@ func (u *Users) SignIn(ctx *gin.Context, input models.SignInInput) (string, erro
 	})
 
 	return token.SignedString(u.secret)
+}
+
+func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {
+	tokenParser := func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("unexpected signign method: %v", token.Header["alg"])
+		}
+
+		return u.secret, nil
+	}
+
+	t, err := jwt.Parse(token, tokenParser)
+	if err != nil {
+		return 0, err
+	}
+
+	if !t.Valid {
+		return 0, errors.New("invalid token")
+	}
+
+	claims, ok := t.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("invalid claims")
+	}
+
+	//sub, ok :=
+	//if !ok {
+	//	return 0, errors.New("invalid subject")
+	//}
+
+	id, err := strconv.Atoi(claims["sub"].(string))
+	if err != nil {
+		return 0, errors.New("invalid subject")
+	}
+
+	return uint(id), nil
 }

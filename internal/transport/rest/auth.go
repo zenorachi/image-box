@@ -8,6 +8,7 @@ import (
 	"github.com/zenorachi/image-box/models"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func (h *handler) signUp(ctx *gin.Context) {
@@ -53,4 +54,43 @@ func (h *handler) signIn(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{"message": "Sign in successful!",
 		"token": token})
+}
+
+func (h *handler) CheckToken() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token, err := getTokenFromRequest(ctx)
+		if err != nil {
+			log.Println("auth middleware")
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "error"})
+			return
+		}
+
+		id, err := h.userService.ParseToken(ctx, token)
+		if err != nil {
+			log.Println("auth middleware", err)
+			ctx.AbortWithStatus(http.StatusBadRequest)
+			return
+		}
+
+		ctx.Set("userId", id)
+		ctx.Next()
+	}
+}
+
+func getTokenFromRequest(ctx *gin.Context) (string, error) {
+	header := ctx.Request.Header.Get("Authorization")
+	if header == "" {
+		return "", errors.New("empty authorization header")
+	}
+
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		return "", errors.New("invalid authorization header")
+	}
+
+	if len(headerParts[1]) == 0 {
+		return "", errors.New("token is empty")
+	}
+
+	return headerParts[1], nil
 }
