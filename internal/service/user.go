@@ -22,19 +22,26 @@ type (
 		Create(ctx *gin.Context, user models.User) error
 		GetByCredentials(ctx *gin.Context, login, password string) (models.User, error)
 	}
+
+	TokenRepository interface {
+		Create(ctx *gin.Context, token models.RefreshToken) error
+		Get(ctx *gin.Context, token string) (models.RefreshToken, error)
+	}
 )
 
 type Users struct {
 	hasher     PasswordHasher
 	repository UserRepository
+	tokenRepo  TokenRepository
 	secret     []byte
 	ttl        time.Duration
 }
 
-func NewUsers(hasher PasswordHasher, repository UserRepository, secret []byte, tokenTTL time.Duration) *Users {
+func NewUsers(hasher PasswordHasher, repository UserRepository, tokenRepo TokenRepository, secret []byte, tokenTTL time.Duration) *Users {
 	return &Users{
 		hasher:     hasher,
 		repository: repository,
+		tokenRepo:  tokenRepo,
 		secret:     secret,
 		ttl:        tokenTTL,
 	}
