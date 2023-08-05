@@ -96,11 +96,6 @@ func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {
 		return 0, errors.New("invalid claims")
 	}
 
-	//sub, ok :=
-	//if !ok {
-	//	return 0, errors.New("invalid subject")
-	//}
-
 	id, err := strconv.Atoi(claims["sub"].(string))
 	if err != nil {
 		return 0, errors.New("invalid subject")
