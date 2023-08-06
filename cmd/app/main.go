@@ -45,20 +45,7 @@ func main() {
 	}
 	defer db.Close()
 
-	/*
-		// minio client
-		endpoint := "http://minio:9000" // Адрес MinIO сервера
-		accessKey := "your-access-key"   // Ваши ключи доступа
-		secretKey := "your-secret-key"
-		useSSL := false
-
-		minioClient, err := minio.New(endpoint, &minio.Options{
-			Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
-			Secure: useSSL,
-		})
-	*/
-
-	endpoint := "192.168.32.2:9000"
+	endpoint := "127.0.0.1:9000"
 	minioRootUser := "root"
 	minioRootPassword := "password"
 
