@@ -11,9 +11,7 @@ type Tokens struct {
 }
 
 func NewTokens(db *sql.DB) *Tokens {
-	return &Tokens{
-		db: db,
-	}
+	return &Tokens{db: db}
 }
 
 func (t *Tokens) Create(ctx *gin.Context, token models.RefreshToken) error {
