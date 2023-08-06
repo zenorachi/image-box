@@ -3,11 +3,8 @@ package service
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
 	"github.com/zenorachi/image-box/models"
-	"strconv"
 	"time"
 )
 
@@ -35,15 +32,17 @@ type Users struct {
 	tokenRepo  TokenRepository
 	secret     []byte
 	ttl        time.Duration
+	refreshTTL time.Duration
 }
 
-func NewUsers(hasher PasswordHasher, repository UserRepository, tokenRepo TokenRepository, secret []byte, tokenTTL time.Duration) *Users {
+func NewUsers(hasher PasswordHasher, repository UserRepository, tokenRepo TokenRepository, secret []byte, tokenTTL time.Duration, refreshTTL time.Duration) *Users {
 	return &Users{
 		hasher:     hasher,
 		repository: repository,
 		tokenRepo:  tokenRepo,
 		secret:     secret,
 		ttl:        tokenTTL,
+		refreshTTL: refreshTTL,
 	}
 }
 
@@ -57,56 +56,19 @@ func (u *Users) SignUp(ctx *gin.Context, input models.SignUpInput) error {
 	return u.repository.Create(ctx, user)
 }
 
-func (u *Users) SignIn(ctx *gin.Context, input models.SignInInput) (string, error) {
+func (u *Users) SignIn(ctx *gin.Context, input models.SignInInput) (string, string, error) {
 	password, err := u.hasher.Hash(input.Password)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	user, err := u.repository.GetByCredentials(ctx, input.Login, password)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return "", UserNotFound
+			return "", "", UserNotFound
 		}
-		return "", err
+		return "", "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		IssuedAt:  time.Now().Unix(),
-		ExpiresAt: time.Now().Add(u.ttl).Unix(), //todo : config time ttl
-		Subject:   strconv.Itoa(int(user.ID)),
-	})
-
-	return token.SignedString(u.secret)
-}
-
-func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {
-	tokenParser := func(token *jwt.Token) (interface{}, error) {
-		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signign method: %v", token.Header["alg"])
-		}
-
-		return u.secret, nil
-	}
-
-	t, err := jwt.Parse(token, tokenParser)
-	if err != nil {
-		return 0, err
-	}
-
-	if !t.Valid {
-		return 0, errors.New("invalid token")
-	}
-
-	claims, ok := t.Claims.(jwt.MapClaims)
-	if !ok {
-		return 0, errors.New("invalid claims")
-	}
-
-	id, err := strconv.Atoi(claims["sub"].(string))
-	if err != nil {
-		return 0, errors.New("invalid subject")
-	}
-
-	return uint(id), nil
+	return u.generateTokens(ctx, user.ID)
 }

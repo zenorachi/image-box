@@ -15,7 +15,8 @@ type Config struct {
 	}
 
 	Auth struct {
-		TTL time.Duration
+		TokenTTL   time.Duration
+		RefreshTTL time.Duration
 	}
 
 	DB postgres.DBConfig

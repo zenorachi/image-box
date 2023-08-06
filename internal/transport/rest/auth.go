@@ -2,6 +2,7 @@ package rest
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
@@ -42,7 +43,7 @@ func (h *handler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	token, err := h.userService.SignIn(ctx, input)
+	accessToken, refreshToken, err := h.userService.SignIn(ctx, input)
 	if err != nil {
 		if errors.Is(err, service.UserNotFound) {
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "You need to Sign up"})
@@ -52,8 +53,28 @@ func (h *handler) signIn(ctx *gin.Context) {
 		return
 	}
 
+	ctx.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
 	ctx.JSON(http.StatusOK, gin.H{"message": "Sign in successful!",
-		"token": token})
+		"token": accessToken})
+}
+
+func (h *handler) refresh(ctx *gin.Context) {
+	cookie, err := ctx.Cookie("refresh-token")
+	if err != nil {
+		log.Println("refresh error")
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
+	if err != nil {
+		log.Println("refresh error")
+		ctx.AbortWithStatus(http.StatusBadRequest)
+		return
+	}
+
+	ctx.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
+	ctx.JSON(http.StatusOK, gin.H{"token": accessToken})
 }
 
 func (h *handler) CheckToken() gin.HandlerFunc {
