@@ -3,13 +3,17 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/minio/minio-go/v7"
+	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/zenorachi/image-box/internal/config"
 	"github.com/zenorachi/image-box/internal/repository"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/rest"
 	"github.com/zenorachi/image-box/pkg/database/postgres"
 	"github.com/zenorachi/image-box/pkg/hash"
+	"github.com/zenorachi/image-box/pkg/storage"
 	"log"
 	"net/http"
 	"os"
@@ -41,13 +45,45 @@ func main() {
 	}
 	defer db.Close()
 
+	/*
+		// minio client
+		endpoint := "http://minio:9000" // Адрес MinIO сервера
+		accessKey := "your-access-key"   // Ваши ключи доступа
+		secretKey := "your-secret-key"
+		useSSL := false
+
+		minioClient, err := minio.New(endpoint, &minio.Options{
+			Creds:  credentials.NewStaticV4(accessKey, secretKey, ""),
+			Secure: useSSL,
+		})
+	*/
+
+	endpoint := "192.168.32.2:9000"
+	minioRootUser := "root"
+	minioRootPassword := "password"
+
+	minioClient, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(minioRootUser, minioRootPassword, ""),
+		Secure: false,
+	})
+
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	fmt.Println(minioClient)
+
 	hasher := hash.NewSHA1Hasher("testLol")
+	provider := storage.NewProvider(minioClient, "kek", "lol")
 
 	usersRepo := repository.NewUsers(db)
 	tokenRepo := repository.NewTokens(db)
-	users := service.NewUsers(hasher, usersRepo, tokenRepo, []byte("kekSecret"), cfg.Auth.TokenTTL, cfg.Auth.RefreshTTL)
+	filesRepo := repository.NewFiles(db)
 
-	handler := rest.NewHandler(users)
+	users := service.NewUsers(hasher, usersRepo, tokenRepo, []byte("kekSecret"), cfg.Auth.TokenTTL, cfg.Auth.RefreshTTL)
+	files := service.NewFiles(filesRepo, provider)
+
+	handler := rest.NewHandler(users, files)
 
 	s := rest.NewServer(handler, cfg.Server.Host, cfg.Server.Port)
 

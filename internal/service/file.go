@@ -17,6 +17,13 @@ type Files struct {
 	provider   storage.Provider
 }
 
+func NewFiles(repository FileRepository, provider storage.Provider) *Files {
+	return &Files{
+		repository: repository,
+		provider:   provider,
+	}
+}
+
 func (f *Files) Upload(ctx *gin.Context, userID uint, input storage.UploadInput) error {
 	url, err := f.provider.Upload(ctx, input)
 	if err != nil {

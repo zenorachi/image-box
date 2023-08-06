@@ -34,8 +34,8 @@ func (s *Server) setupRoutes(router *gin.Engine, mw middleware.Middleware, handl
 	router.POST("/sign-up", mw.CheckBody(), mw.CheckJSONSignUp(), handler.signUp)
 	router.POST("/sign-in", mw.CheckBody(), mw.CheckJSONSignIn(), handler.signIn)
 	router.GET("/refresh", handler.refresh)
-	router.GET("/files", handler.CheckToken(), handler.files)
-	//todo: get files, upload file
+	router.POST("/upload", handler.CheckToken(), handler.upload)
+	//todo: get files
 }
 
 func (s *Server) Run() error {

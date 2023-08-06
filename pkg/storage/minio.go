@@ -12,7 +12,7 @@ type FileStorage struct {
 	endpoint string
 }
 
-func NewFileStorage(client *minio.Client, bucket, endpoint string) *FileStorage {
+func NewProvider(client *minio.Client, bucket, endpoint string) *FileStorage {
 	return &FileStorage{
 		client:   client,
 		bucket:   bucket,

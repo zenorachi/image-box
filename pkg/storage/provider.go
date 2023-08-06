@@ -15,3 +15,12 @@ type UploadInput struct {
 type Provider interface {
 	Upload(ctx *gin.Context, input UploadInput) (string, error)
 }
+
+func NewUploadInput(file io.Reader, name string, size int64, contentType string) UploadInput {
+	return UploadInput{
+		File:        file,
+		Name:        name,
+		Size:        size,
+		ContentType: contentType,
+	}
+}
