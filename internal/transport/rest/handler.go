@@ -7,14 +7,16 @@ import (
 
 type User interface {
 	SignUp(ctx *gin.Context, input models.SignUpInput) error
-	SignIn(ctx *gin.Context, input models.SignInInput) (string, error)
+	SignIn(ctx *gin.Context, input models.SignInInput) (string, string, error)
 	ParseToken(ctx *gin.Context, token string) (uint, error)
+	RefreshTokens(ctx *gin.Context, refreshToken string) (string, string, error)
 }
 
 type (
 	AuthHandler interface {
 		signUp(ctx *gin.Context)
 		signIn(ctx *gin.Context)
+		refresh(ctx *gin.Context)
 	}
 
 	FileHandler interface {

@@ -33,6 +33,7 @@ func NewServer(h Handler, host string, port int) *Server {
 func (s *Server) setupRoutes(router *gin.Engine, mw middleware.Middleware, handler Handler) {
 	router.POST("/sign-up", mw.CheckBody(), mw.CheckJSONSignUp(), handler.signUp)
 	router.POST("/sign-in", mw.CheckBody(), mw.CheckJSONSignIn(), handler.signIn)
+	router.GET("/refresh", handler.refresh)
 	router.GET("/files", handler.CheckToken(), handler.files)
 	//todo: get files, upload file
 }
