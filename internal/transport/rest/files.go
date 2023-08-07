@@ -1,7 +1,9 @@
 package rest
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"log"
 	"net/http"
@@ -62,8 +64,13 @@ func (h *handler) get(ctx *gin.Context) {
 	}
 	files, err := h.fileService.Get(ctx, userID)
 	if err != nil {
+		if errors.Is(err, service.UserNotFound) {
+			log.Println(service.UserNotFound)
+			ctx.JSON(http.StatusNoContent, gin.H{"message": service.UserNotFound})
+			return
+		}
 		log.Println("get files", err)
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "error"})
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "error receiving files"})
 		return
 	}
 

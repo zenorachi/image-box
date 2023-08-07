@@ -1,11 +1,14 @@
 package service
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"time"
 )
+
+var FilesNotFound = errors.New("files not found")
 
 type FileRepository interface {
 	Create(ctx *gin.Context, file models.File) error

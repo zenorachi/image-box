@@ -2,7 +2,9 @@ package repository
 
 import (
 	"database/sql"
+	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/models"
 )
 
@@ -28,6 +30,9 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 		"FROM files "+
 		"WHERE user_id = $1", userID)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, service.UserNotFound
+		}
 		return nil, err
 	}
 
