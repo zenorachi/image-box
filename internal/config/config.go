@@ -24,6 +24,11 @@ type Config struct {
 		Bucket   string
 	}
 
+	Hash struct {
+		Salt   string
+		Secret string
+	}
+
 	DB postgres.DBConfig
 }
 
@@ -46,6 +51,10 @@ func New(directory, filename string) (*Config, error) {
 	}
 
 	if err := envconfig.Process("db", &cfg.DB); err != nil {
+		return nil, err
+	}
+
+	if err := envconfig.Process("hash", &cfg.Hash); err != nil {
 		return nil, err
 	}
 

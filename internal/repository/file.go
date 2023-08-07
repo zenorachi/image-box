@@ -27,6 +27,9 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 	rows, err := f.db.Query("SELECT id, user_id, name, url, size, uploaded_at "+
 		"FROM files "+
 		"WHERE user_id = $1", userID)
+	if err != nil {
+		return nil, err
+	}
 
 	for rows.Next() {
 		var file models.File

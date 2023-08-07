@@ -57,21 +57,27 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{})
+	if isExist, _ := minioClient.BucketExists(context.Background(), cfg.Minio.Bucket); !isExist {
+		err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{})
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 
-	hasher := hash.NewSHA1Hasher("testLol")
+	hasher := hash.NewSHA1Hasher(cfg.Hash.Salt)
 	provider := storage.NewProvider(minioClient, cfg.Minio.Bucket, cfg.Minio.Endpoint)
 	policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::` + cfg.Minio.Bucket + `/*"]}]}`
 	err = minioClient.SetBucketPolicy(context.Background(), cfg.Minio.Bucket, policy)
 	if err != nil {
 		log.Fatalln(err)
 	}
+	fmt.Println(cfg.Hash)
 
 	usersRepo := repository.NewUsers(db)
 	tokenRepo := repository.NewTokens(db)
 	filesRepo := repository.NewFiles(db)
 
-	users := service.NewUsers(hasher, usersRepo, tokenRepo, []byte("kekSecret"), cfg.Auth.TokenTTL, cfg.Auth.RefreshTTL)
+	users := service.NewUsers(hasher, usersRepo, tokenRepo, []byte(cfg.Hash.Secret), cfg.Auth.TokenTTL, cfg.Auth.RefreshTTL)
 	files := service.NewFiles(filesRepo, provider)
 
 	handler := rest.NewHandler(users, files)
