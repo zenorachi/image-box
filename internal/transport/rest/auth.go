@@ -7,69 +7,66 @@ import (
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/models"
-	"log"
 	"net/http"
 	"strings"
 )
 
 func (h *handler) signUp(ctx *gin.Context) {
 	inputBodySignUp, _ := ctx.Get(middleware.InputSignUp)
-
 	input, _ := inputBodySignUp.(models.SignUpInput)
 
 	if err := input.Validate(); err != nil {
-		log.Println("signUp handler", err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		LogError(SignUpHandler, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
 	if err := h.userService.SignUp(ctx, input); err != nil {
-		log.Println("signUp handler", err)
-		ctx.AbortWithStatus(http.StatusInternalServerError)
+		LogError(SignUpHandler, err)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "registration is not completed"})
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "Sign up successful!"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "sign up successful!"})
 }
 
 func (h *handler) signIn(ctx *gin.Context) {
 	inputBodySignIn, _ := ctx.Get(middleware.InputSignIn)
-
 	input, _ := inputBodySignIn.(models.SignInInput)
 
 	if err := input.Validate(); err != nil {
-		log.Println("signIn handler", err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		LogError(SignInHandler, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
 	accessToken, refreshToken, err := h.userService.SignIn(ctx, input)
 	if err != nil {
+		LogError(SignInHandler, err)
 		if errors.Is(err, service.UserNotFound) {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"message": "You need to Sign up"})
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "you're unauthorized"})
+			return
 		}
-		log.Println("signIn handler", err)
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "authentication is not completed"})
 		return
 	}
 
 	ctx.Header("Set-Cookie", fmt.Sprintf("refresh-token=%s; HttpOnly", refreshToken))
-	ctx.JSON(http.StatusOK, gin.H{"message": "Sign in successful!",
-		"token": accessToken})
+	ctx.JSON(http.StatusOK, gin.H{"token": accessToken})
 }
 
 func (h *handler) refresh(ctx *gin.Context) {
 	cookie, err := ctx.Cookie("refresh-token")
 	if err != nil {
-		log.Println("refresh cookie error")
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		LogError(RefreshHandler, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "refresh-token not found"})
 		return
 	}
 
 	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
 	if err != nil {
-		log.Println("refresh service error")
-		ctx.AbortWithStatus(http.StatusBadRequest)
+		LogError(RefreshHandler, err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "cannot create JWT"})
 		return
 	}
 
@@ -81,20 +78,18 @@ func (h *handler) CheckToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := getTokenFromRequest(ctx)
 		if err != nil {
-			log.Println("auth middleware")
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "error"})
+			LogError(AuthMiddleware, err)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "JWT not found"})
 			return
 		}
 
 		id, err := h.userService.ParseToken(ctx, token)
 		if err != nil {
-			log.Println("auth middleware", err)
-			ctx.AbortWithStatus(http.StatusBadRequest)
-			return
+			LogError(AuthMiddleware, err)
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "cannot parse token"})
 		}
 
 		ctx.Set("userID", id)
-		fmt.Println(id)
 		ctx.Next()
 	}
 }

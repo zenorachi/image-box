@@ -3,8 +3,8 @@ package middleware
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/transport/rest"
 	"github.com/zenorachi/image-box/models"
-	"log"
 	"net/http"
 )
 
@@ -14,9 +14,8 @@ func (mw *middleware) CheckJSONSignUp() gin.HandlerFunc {
 		body := requestBody.([]byte)
 		var input models.SignUpInput
 		if err := json.Unmarshal(body, &input); err != nil {
-			log.Println("signUp middleware", err)
-			ctx.AbortWithStatus(http.StatusBadRequest)
-			return
+			rest.LogError(rest.AuthMiddleware, err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		}
 
 		ctx.Set(InputSignUp, input)
@@ -30,9 +29,8 @@ func (mw *middleware) CheckJSONSignIn() gin.HandlerFunc {
 		body := requestBody.([]byte)
 		var input models.SignInInput
 		if err := json.Unmarshal(body, &input); err != nil {
-			log.Println("signIn middleware", err)
-			ctx.AbortWithStatus(http.StatusBadRequest)
-			return
+			rest.LogError(rest.AuthMiddleware, err)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		}
 
 		ctx.Set(InputSignIn, input)

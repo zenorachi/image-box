@@ -31,7 +31,7 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 		"WHERE user_id = $1", userID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return nil, service.UserNotFound
+			return nil, service.FilesNotFound
 		}
 		return nil, err
 	}
