@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -53,15 +52,17 @@ func main() {
 		Creds:  credentials.NewStaticV4(minioRootUser, minioRootPassword, ""),
 		Secure: false,
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(minioClient)
-
 	hasher := hash.NewSHA1Hasher("testLol")
-	provider := storage.NewProvider(minioClient, "kek", "lol")
+	provider := storage.NewProvider(minioClient, "kek", endpoint)
+	policy := `{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::kek/*"],"Sid": ""}]}`
+	err = minioClient.SetBucketPolicy(context.Background(), "kek", policy)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	usersRepo := repository.NewUsers(db)
 	tokenRepo := repository.NewTokens(db)

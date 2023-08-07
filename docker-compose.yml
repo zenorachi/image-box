@@ -19,8 +19,6 @@ services:
     ports:
       - "9000:9000"
       - "9001:9001"
-    environment:
-      MINIO_PARITY: 2
     env_file:
       - .env
     volumes:

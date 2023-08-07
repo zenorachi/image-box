@@ -17,7 +17,7 @@ func (h *handler) upload(ctx *gin.Context) {
 
 	uploadedFile, err := file.Open()
 	if err != nil {
-		// Обработка ошибки
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": err})
 	}
 	defer uploadedFile.Close()
 
@@ -43,5 +43,5 @@ func (h *handler) upload(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{"message": "file uploaded successful"})
+	ctx.JSON(http.StatusCreated, gin.H{"message": "file uploaded successful"})
 }
