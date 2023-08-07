@@ -13,9 +13,7 @@ type Server struct {
 }
 
 func NewServer(h Handler, host string, port int) *Server {
-	//TODO: gin.New() to create custom logger (logrus)
-	//router := gin.New()
-	router := gin.Default()
+	router := gin.New()
 	mw := middleware.NewMiddleware()
 
 	server := &Server{
@@ -33,7 +31,7 @@ func NewServer(h Handler, host string, port int) *Server {
 func (s *Server) setupRoutes(router *gin.Engine, mw middleware.Middleware, handler Handler) {
 	router.POST("/sign-up", mw.CheckBody(), mw.CheckJSONSignUp(), handler.signUp)
 	router.POST("/sign-in", mw.CheckBody(), mw.CheckJSONSignIn(), handler.signIn)
-	router.POST("/upload", handler.CheckToken(), handler.upload)
+	router.POST("/upload", handler.CheckToken(), mw.CheckUploadInput(), handler.upload)
 	router.GET("/refresh", handler.refresh)
 	router.GET("/files", handler.CheckToken(), handler.get)
 }

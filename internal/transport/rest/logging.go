@@ -11,6 +11,7 @@ const (
 	UploadHandler   = "uploadHandler"
 	GetFilesHandler = "getFilesHandler"
 	AuthMiddleware  = "authMiddleware"
+	FilesMiddleware = "filesMiddleware"
 )
 
 func logFields(handler string) logrus.Fields {

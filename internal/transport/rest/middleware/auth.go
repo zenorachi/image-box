@@ -5,8 +5,24 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/transport/rest"
 	"github.com/zenorachi/image-box/models"
+	"io"
+	"log"
 	"net/http"
 )
+
+func (mw *middleware) CheckBody() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		body, err := io.ReadAll(ctx.Request.Body)
+		if err != nil {
+			log.Println("checkBody middleware", err)
+			ctx.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
+
+		ctx.Set(requestBody, body)
+		ctx.Next()
+	}
+}
 
 func (mw *middleware) CheckJSONSignUp() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

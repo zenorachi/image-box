@@ -4,46 +4,22 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
+	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"net/http"
 	"strings"
 )
 
 func (h *handler) upload(ctx *gin.Context) {
-	file, err := ctx.FormFile("file")
-	if err != nil {
+	upload, _ := ctx.Get(middleware.UploadInput)
+	uploadInput := upload.(storage.UploadInput)
+
+	userIdCtx, _ := ctx.Get("userID")
+	userID := userIdCtx.(uint)
+
+	if err := h.fileService.Upload(ctx, userID, uploadInput); err != nil {
 		LogError(UploadHandler, err)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "file is required"})
-		return
-	}
-
-	uploadedFile, err := file.Open()
-	if err != nil {
-		LogError(UploadHandler, err)
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
-	}
-	defer uploadedFile.Close()
-
-	uploadInput := storage.NewUploadInput(uploadedFile, file.Filename,
-		file.Size, file.Header.Get("Content-Type"))
-
-	userIdCtx, ok := ctx.Get("userID")
-	if !ok {
-		LogError(UploadHandler, errors.New("user id not found"))
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "user id not found"})
-		return
-	}
-
-	userID, ok := userIdCtx.(uint)
-	if !ok {
-		LogError(UploadHandler, errors.New("user id invalid type"))
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "user id not found"})
-		return
-	}
-
-	if err = h.fileService.Upload(ctx, userID, uploadInput); err != nil {
-		LogError(UploadHandler, err)
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "user id not found"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -51,26 +27,17 @@ func (h *handler) upload(ctx *gin.Context) {
 }
 
 func (h *handler) get(ctx *gin.Context) {
-	userIdCtx, ok := ctx.Get("userID")
-	if !ok {
-		LogError(GetFilesHandler, errors.New("user id not found"))
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "user id not found"})
-		return
-	}
-	userID, ok := userIdCtx.(uint)
-	if !ok {
-		LogError(GetFilesHandler, errors.New("user id invalid type"))
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "user id not found"})
-		return
-	}
+	userIdCtx, _ := ctx.Get("userID")
+	userID := userIdCtx.(uint)
+
 	files, err := h.fileService.Get(ctx, userID)
 	if err != nil {
 		LogError(GetFilesHandler, err)
 		if errors.Is(err, service.FilesNotFound) {
-			ctx.JSON(http.StatusNoContent, gin.H{"message": err})
+			ctx.JSON(http.StatusNoContent, gin.H{"error": err})
 			return
 		}
-		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "error receiving files"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "error receiving files"})
 		return
 	}
 

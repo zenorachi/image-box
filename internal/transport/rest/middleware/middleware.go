@@ -6,20 +6,21 @@ const (
 	InputSignUp = "inputSignUp"
 	InputSignIn = "inputSignIn"
 	requestBody = "requestBody"
+	UploadInput = "uploadInput"
 )
 
 type (
 	AuthMiddleware interface {
+		CheckBody() gin.HandlerFunc
 		CheckJSONSignUp() gin.HandlerFunc
 		CheckJSONSignIn() gin.HandlerFunc
 	}
 
 	FilesMiddleware interface {
-		// TODO
+		CheckUploadInput() gin.HandlerFunc
 	}
 
 	Middleware interface {
-		CheckBody() gin.HandlerFunc
 		AuthMiddleware
 		FilesMiddleware
 	}
