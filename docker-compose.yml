@@ -28,7 +28,7 @@ services:
       - devdzen
 
   db:
-    restart: always
+    restart: on-failure
     image: postgres:latest
     ports:
       - "5436:5432"

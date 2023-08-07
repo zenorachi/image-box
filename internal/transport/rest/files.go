@@ -68,8 +68,9 @@ func (h *handler) get(ctx *gin.Context) {
 	}
 
 	//TODO: DELETE THIS CRINGE
-	for _, file := range files {
+	for i, file := range files {
 		file.URL = strings.ReplaceAll(file.URL, "minio", "localhost")
+		files[i] = file
 	}
 
 	ctx.JSON(http.StatusOK, files)
