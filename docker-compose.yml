@@ -15,9 +15,10 @@ services:
 
   minio:
     image: minio/minio
-    command: server /data
+    command: minio server --console-address ":9001" /data
     ports:
       - "9000:9000"
+      - "9001:9001"
     env_file:
       - .env
     volumes:
@@ -29,7 +30,7 @@ services:
     restart: always
     image: postgres:latest
     ports:
-        - "5436:5432"
+      - "5436:5432"
     env_file:
       - .env
     volumes:
@@ -45,3 +46,13 @@ networks:
 volumes:
   minio_data:
   pg_data:
+
+
+#  nginx:
+#    build: ./nginx/
+#    ports:
+#      - "80:80"
+#    volumes:
+#      - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
+#    networks:
+#      - devdzen

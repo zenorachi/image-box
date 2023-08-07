@@ -25,7 +25,3 @@ COPY --from=build /root/scripts/database/wait-db.sh /root/
 
 # Install psql-client
 RUN apk add --no-cache postgresql-client
-
-# Set permissions
-#RUN chmod +x /root/app
-#RUN chmod +x /root/wait-db.sh

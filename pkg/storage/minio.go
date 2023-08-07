@@ -12,7 +12,7 @@ type FileStorage struct {
 	endpoint string
 }
 
-func NewFileStorage(client *minio.Client, bucket, endpoint string) *FileStorage {
+func NewProvider(client *minio.Client, bucket, endpoint string) *FileStorage {
 	return &FileStorage{
 		client:   client,
 		bucket:   bucket,
@@ -34,5 +34,5 @@ func (fs *FileStorage) Upload(ctx *gin.Context, input UploadInput) (string, erro
 }
 
 func (fs *FileStorage) generateFileURL(filename string) string {
-	return fmt.Sprintf("https://%s.%s/%s", fs.bucket, fs.endpoint, filename)
+	return fmt.Sprintf("http://%s/%s/%s", fs.endpoint, fs.bucket, filename)
 }

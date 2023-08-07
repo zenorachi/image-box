@@ -93,7 +93,8 @@ func (h *handler) CheckToken() gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set("userId", id)
+		ctx.Set("userID", id)
+		fmt.Println(id)
 		ctx.Next()
 	}
 }
