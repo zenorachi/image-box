@@ -30,7 +30,7 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 
 	for rows.Next() {
 		var file models.File
-		err = rows.Scan(&file.ID, file.UserID, file.Name, file.URL, file.Size, file.UploadedAt)
+		err = rows.Scan(&file.ID, &file.UserID, &file.Name, &file.URL, &file.Size, &file.UploadedAt)
 		if err != nil {
 			return nil, err
 		}

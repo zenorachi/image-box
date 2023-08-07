@@ -45,3 +45,26 @@ func (h *handler) upload(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, gin.H{"message": "file uploaded successful"})
 }
+
+func (h *handler) get(ctx *gin.Context) {
+	userIdCtx, ok := ctx.Get("userID")
+	if !ok {
+		log.Println("user id not found")
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "user id not found"})
+		return
+	}
+	userID, ok := userIdCtx.(uint)
+	if !ok {
+		log.Println("user id invalid type")
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "user id not found"})
+		return
+	}
+	files, err := h.fileService.Get(ctx, userID)
+	if err != nil {
+		log.Println("get files", err)
+		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, files)
+}

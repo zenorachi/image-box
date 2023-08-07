@@ -16,6 +16,7 @@ type (
 
 	File interface {
 		Upload(ctx *gin.Context, userID uint, input storage.UploadInput) error
+		Get(ctx *gin.Context, userID uint) ([]models.File, error)
 	}
 )
 
@@ -28,6 +29,7 @@ type (
 
 	FileHandler interface {
 		upload(ctx *gin.Context)
+		get(ctx *gin.Context)
 	}
 )
 

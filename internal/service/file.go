@@ -33,3 +33,7 @@ func (f *Files) Upload(ctx *gin.Context, userID uint, input storage.UploadInput)
 	file := models.CreateFile(userID, input.Name, url, input.Size, time.Now())
 	return f.repository.Create(ctx, file)
 }
+
+func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
+	return f.repository.Get(ctx, userID)
+}
