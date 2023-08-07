@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -44,22 +45,24 @@ func main() {
 	}
 	defer db.Close()
 
-	endpoint := "127.0.0.1:9000"
-	minioRootUser := "root"
-	minioRootPassword := "password"
+	minioRootUser := os.Getenv("MINIO_ROOT_USER")
+	minioRootPassword := os.Getenv("MINIO_ROOT_PASSWORD")
+	fmt.Println(minioRootPassword, minioRootUser)
+	fmt.Println(cfg.Minio)
 
-	minioClient, err := minio.New(endpoint, &minio.Options{
+	minioClient, err := minio.New(cfg.Minio.Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(minioRootUser, minioRootPassword, ""),
 		Secure: false,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
+	err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{})
 
 	hasher := hash.NewSHA1Hasher("testLol")
-	provider := storage.NewProvider(minioClient, "kek", endpoint)
-	policy := `{"Version": "2012-10-17","Statement": [{"Action": ["s3:GetObject"],"Effect": "Allow","Principal": {"AWS": ["*"]},"Resource": ["arn:aws:s3:::kek/*"],"Sid": ""}]}`
-	err = minioClient.SetBucketPolicy(context.Background(), "kek", policy)
+	provider := storage.NewProvider(minioClient, cfg.Minio.Bucket, cfg.Minio.Endpoint)
+	policy := fmt.Sprintf("{\"Version\": \"2012-10-17\",\"Statement\": [{\"Action\": [\"s3:GetObject\"],\"Effect\": \"Allow\",\"Principal\": {\"AWS\": [\"*\"]},\"Resource\": [\"arn:aws:s3:::%s/*\"],\"Sid\": \"\"}]}", cfg.Minio.Bucket)
+	err = minioClient.SetBucketPolicy(context.Background(), cfg.Minio.Bucket, policy)
 	if err != nil {
 		log.Fatalln(err)
 	}

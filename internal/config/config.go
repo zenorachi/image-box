@@ -19,6 +19,11 @@ type Config struct {
 		RefreshTTL time.Duration
 	}
 
+	Minio struct {
+		Endpoint string
+		Bucket   string
+	}
+
 	DB postgres.DBConfig
 }
 

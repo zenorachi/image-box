@@ -5,3 +5,7 @@ server:
 auth:
   tokenTtl: 15m
   refreshTtl: 744h
+
+minio:
+  endpoint: 127.0.0.1:9000
+  bucket: image-box
