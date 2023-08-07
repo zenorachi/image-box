@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
+	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"net/http"
@@ -18,7 +19,7 @@ func (h *handler) upload(ctx *gin.Context) {
 	userID := userIdCtx.(uint)
 
 	if err := h.fileService.Upload(ctx, userID, uploadInput); err != nil {
-		LogError(UploadHandler, err)
+		logger.LogError(logger.UploadHandler, err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
@@ -32,7 +33,7 @@ func (h *handler) get(ctx *gin.Context) {
 
 	files, err := h.fileService.Get(ctx, userID)
 	if err != nil {
-		LogError(GetFilesHandler, err)
+		logger.LogError(logger.GetFilesHandler, err)
 		if errors.Is(err, service.FilesNotFound) {
 			ctx.JSON(http.StatusNoContent, gin.H{"error": err})
 			return

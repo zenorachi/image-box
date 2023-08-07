@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
+	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/models"
 	"net/http"
@@ -16,13 +17,13 @@ func (h *handler) signUp(ctx *gin.Context) {
 	input, _ := inputBodySignUp.(models.SignUpInput)
 
 	if err := input.Validate(); err != nil {
-		LogError(SignUpHandler, err)
+		logger.LogError(logger.SignUpHandler, err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
 	if err := h.userService.SignUp(ctx, input); err != nil {
-		LogError(SignUpHandler, err)
+		logger.LogError(logger.SignUpHandler, err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "registration is not completed"})
 		return
 	}
@@ -35,14 +36,14 @@ func (h *handler) signIn(ctx *gin.Context) {
 	input, _ := inputBodySignIn.(models.SignInInput)
 
 	if err := input.Validate(); err != nil {
-		LogError(SignInHandler, err)
+		logger.LogError(logger.SignInHandler, err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		return
 	}
 
 	accessToken, refreshToken, err := h.userService.SignIn(ctx, input)
 	if err != nil {
-		LogError(SignInHandler, err)
+		logger.LogError(logger.SignInHandler, err)
 		if errors.Is(err, service.UserNotFound) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": "you're unauthorized"})
 			return
@@ -58,14 +59,14 @@ func (h *handler) signIn(ctx *gin.Context) {
 func (h *handler) refresh(ctx *gin.Context) {
 	cookie, err := ctx.Cookie("refresh-token")
 	if err != nil {
-		LogError(RefreshHandler, err)
+		logger.LogError(logger.RefreshHandler, err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "refresh-token not found"})
 		return
 	}
 
 	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
 	if err != nil {
-		LogError(RefreshHandler, err)
+		logger.LogError(logger.RefreshHandler, err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "cannot create JWT"})
 		return
 	}
@@ -78,14 +79,14 @@ func (h *handler) CheckToken() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		token, err := getTokenFromRequest(ctx)
 		if err != nil {
-			LogError(AuthMiddleware, err)
+			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "JWT not found"})
 			return
 		}
 
 		id, err := h.userService.ParseToken(ctx, token)
 		if err != nil {
-			LogError(AuthMiddleware, err)
+			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "cannot parse token"})
 		}
 

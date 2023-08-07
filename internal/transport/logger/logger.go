@@ -1,8 +1,6 @@
-package rest
+package logger
 
-import (
-	"github.com/sirupsen/logrus"
-)
+import "github.com/sirupsen/logrus"
 
 const (
 	SignUpHandler   = "signUp"

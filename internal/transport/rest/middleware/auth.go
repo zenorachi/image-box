@@ -3,10 +3,9 @@ package middleware
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/internal/transport/rest"
+	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/models"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -14,9 +13,8 @@ func (mw *middleware) CheckBody() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		body, err := io.ReadAll(ctx.Request.Body)
 		if err != nil {
-			log.Println("checkBody middleware", err)
-			ctx.AbortWithStatus(http.StatusInternalServerError)
-			return
+			logger.LogError(logger.AuthMiddleware, err)
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
 		}
 
 		ctx.Set(requestBody, body)
@@ -30,7 +28,7 @@ func (mw *middleware) CheckJSONSignUp() gin.HandlerFunc {
 		body := requestBody.([]byte)
 		var input models.SignUpInput
 		if err := json.Unmarshal(body, &input); err != nil {
-			rest.LogError(rest.AuthMiddleware, err)
+			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		}
 
@@ -45,7 +43,7 @@ func (mw *middleware) CheckJSONSignIn() gin.HandlerFunc {
 		body := requestBody.([]byte)
 		var input models.SignInInput
 		if err := json.Unmarshal(body, &input); err != nil {
-			rest.LogError(rest.AuthMiddleware, err)
+			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
 		}
 
