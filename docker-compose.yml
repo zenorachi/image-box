@@ -10,6 +10,7 @@ services:
       - .env
     depends_on:
       - db
+      - minio
     networks:
       - devdzen
 
@@ -46,13 +47,3 @@ networks:
 volumes:
   minio_data:
   pg_data:
-
-
-#  nginx:
-#    build: ./nginx/
-#    ports:
-#      - "80:80"
-#    volumes:
-#      - /etc/nginx/sites-enabled:/etc/nginx/sites-enabled:ro
-#    networks:
-#      - devdzen

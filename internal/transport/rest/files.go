@@ -5,6 +5,7 @@ import (
 	"github.com/zenorachi/image-box/pkg/storage"
 	"log"
 	"net/http"
+	"strings"
 )
 
 func (h *handler) upload(ctx *gin.Context) {
@@ -64,6 +65,11 @@ func (h *handler) get(ctx *gin.Context) {
 		log.Println("get files", err)
 		ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"message": "error"})
 		return
+	}
+
+	//TODO: DELETE THIS CRINGE
+	for _, file := range files {
+		file.URL = strings.ReplaceAll(file.URL, "minio", "localhost")
 	}
 
 	ctx.JSON(http.StatusOK, files)

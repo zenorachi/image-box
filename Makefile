@@ -2,10 +2,10 @@
 .DEFAULT_GOAL: build
 .PHONY: build run stop lint
 
-build: stop
+build:
 	docker-compose up --build
 
-run: stop
+run:
 	docker-compose up
 
 stop:

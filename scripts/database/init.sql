@@ -10,6 +10,15 @@ CREATE TABLE users (
    registered_at TIMESTAMP
 );
 
+CREATE TABLE files (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(255) UNIQUE NOT NULL,
+    url VARCHAR(255) UNIQUE NOT NULL,
+    size BIGINT,
+    uploaded_at timestamp
+);
+
 CREATE TABLE refresh_tokens (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,

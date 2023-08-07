@@ -61,14 +61,14 @@ func (h *handler) signIn(ctx *gin.Context) {
 func (h *handler) refresh(ctx *gin.Context) {
 	cookie, err := ctx.Cookie("refresh-token")
 	if err != nil {
-		log.Println("refresh error")
+		log.Println("refresh cookie error")
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}
 
 	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
 	if err != nil {
-		log.Println("refresh error")
+		log.Println("refresh service error")
 		ctx.AbortWithStatus(http.StatusBadRequest)
 		return
 	}

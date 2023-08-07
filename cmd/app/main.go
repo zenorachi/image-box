@@ -58,7 +58,9 @@ func main() {
 		log.Fatalln(err)
 	}
 	if isExist, _ := minioClient.BucketExists(context.Background(), cfg.Minio.Bucket); !isExist {
-		err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{})
+		err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{
+			Region: "eu-central-1",
+		})
 		if err != nil {
 			log.Fatalln(err)
 		}
