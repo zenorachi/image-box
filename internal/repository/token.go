@@ -31,7 +31,7 @@ func (t *Tokens) Get(ctx *gin.Context, token string) (models.RefreshToken, error
 		return models.RefreshToken{}, err
 	}
 
-	_, err = t.db.Exec("DELETE FROM refresh_tokens WHERE user_id = $1", refreshToken.UserID)
+	_, err = t.db.Exec("DELETE FROM refresh_tokens WHERE token = $1", token)
 
 	return refreshToken, err
 }
