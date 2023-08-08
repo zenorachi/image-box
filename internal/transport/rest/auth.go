@@ -65,7 +65,11 @@ func (h *handler) refresh(ctx *gin.Context) {
 	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
 	if err != nil {
 		logger.LogError(logger.RefreshHandler, err)
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "cannot create JWT"})
+		if errors.Is(err, service.UserNotFound) {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "you need to sign up"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "cannot create JWT"})
 		return
 	}
 

@@ -66,7 +66,7 @@ func (h *handler) CheckToken() gin.HandlerFunc {
 		id, err := h.userService.ParseToken(ctx, token)
 		if err != nil {
 			logger.LogError(logger.AuthMiddleware, err)
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "cannot parse token"})
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token is expired"})
 		}
 
 		ctx.Set("userID", id)

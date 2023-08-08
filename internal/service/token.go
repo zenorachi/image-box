@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -70,6 +71,9 @@ func (u *Users) generateTokens(ctx *gin.Context, userID uint) (string, string, e
 func (u *Users) RefreshTokens(ctx *gin.Context, refreshToken string) (string, string, error) {
 	token, err := u.tokenRepo.Get(ctx, refreshToken)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", "", UserNotFound
+		}
 		return "", "", err
 	}
 
