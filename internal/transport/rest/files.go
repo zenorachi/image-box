@@ -5,14 +5,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/logger"
-	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"net/http"
 	"strings"
 )
 
 func (h *handler) upload(ctx *gin.Context) {
-	upload, _ := ctx.Get(middleware.UploadInput)
+	upload, _ := ctx.Get(uploadFile)
 	uploadInput := upload.(storage.UploadInput)
 
 	userIdCtx, _ := ctx.Get("userID")

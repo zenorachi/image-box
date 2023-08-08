@@ -6,6 +6,13 @@ import (
 	"github.com/zenorachi/image-box/pkg/storage"
 )
 
+const (
+	inputSignUp = "inputSignUp"
+	inputSignIn = "inputSignIn"
+	requestBody = "requestBody"
+	uploadFile  = "uploadInput"
+)
+
 type (
 	User interface {
 		SignUp(ctx *gin.Context, input models.SignUpInput) error
@@ -27,16 +34,28 @@ type (
 		refresh(ctx *gin.Context)
 	}
 
+	AuthMiddleware interface {
+		CheckBody() gin.HandlerFunc
+		CheckJSONSignUp() gin.HandlerFunc
+		CheckJSONSignIn() gin.HandlerFunc
+		CheckToken() gin.HandlerFunc
+	}
+
 	FileHandler interface {
 		upload(ctx *gin.Context)
 		get(ctx *gin.Context)
 	}
+
+	FileMiddleware interface {
+		CheckUploadInput() gin.HandlerFunc
+	}
 )
 
 type Handler interface {
-	CheckToken() gin.HandlerFunc
 	AuthHandler
+	AuthMiddleware
 	FileHandler
+	FileMiddleware
 }
 
 type handler struct {

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/internal/transport/rest/middleware"
 	"net/http"
 )
 
@@ -14,7 +13,6 @@ type Server struct {
 
 func NewServer(h Handler, host string, port int) *Server {
 	router := gin.New()
-	mw := middleware.NewMiddleware()
 
 	server := &Server{
 		server: &http.Server{
@@ -23,17 +21,17 @@ func NewServer(h Handler, host string, port int) *Server {
 		},
 	}
 
-	server.setupRoutes(router, mw, h)
+	server.setupRoutes(router, h)
 
 	return server
 }
 
-func (s *Server) setupRoutes(router *gin.Engine, mw middleware.Middleware, handler Handler) {
-	router.POST("/sign-up", mw.CheckBody(), mw.CheckJSONSignUp(), handler.signUp)
-	router.POST("/sign-in", mw.CheckBody(), mw.CheckJSONSignIn(), handler.signIn)
-	router.POST("/upload", handler.CheckToken(), mw.CheckUploadInput(), handler.upload)
-	router.GET("/refresh", handler.refresh)
-	router.GET("/files", handler.CheckToken(), handler.get)
+func (s *Server) setupRoutes(router *gin.Engine, h Handler) {
+	router.POST("/sign-up", h.CheckBody(), h.CheckJSONSignUp(), h.signUp)
+	router.POST("/sign-in", h.CheckBody(), h.CheckJSONSignIn(), h.signIn)
+	router.POST("/upload", h.CheckToken(), h.CheckUploadInput(), h.upload)
+	router.GET("/refresh", h.refresh)
+	router.GET("/files", h.CheckToken(), h.get)
 }
 
 func (s *Server) Run() error {

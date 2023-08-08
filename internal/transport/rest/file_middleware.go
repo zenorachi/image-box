@@ -1,4 +1,4 @@
-package middleware
+package rest
 
 import (
 	"github.com/gin-gonic/gin"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (mw *middleware) CheckUploadInput() gin.HandlerFunc {
+func (h *handler) CheckUploadInput() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		file, err := ctx.FormFile("file")
 		if err != nil {
@@ -26,7 +26,7 @@ func (mw *middleware) CheckUploadInput() gin.HandlerFunc {
 		uploadInput := storage.NewUploadInput(uploadedFile, file.Filename,
 			file.Size, file.Header.Get("Content-Type"))
 
-		ctx.Set(UploadInput, uploadInput)
+		ctx.Set(uploadFile, uploadInput)
 		ctx.Next()
 	}
 }
