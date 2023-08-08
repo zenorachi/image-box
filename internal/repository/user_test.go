@@ -13,7 +13,7 @@ import (
 func TestUsers_Get(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("error creating database connection: %v", err)
+		t.Fatalf("error creating database connection: %v\n", err)
 	}
 	defer db.Close()
 
@@ -88,7 +88,7 @@ func TestUsers_Get(t *testing.T) {
 func TestUsers_Create(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
-		t.Fatalf("error creating database connection: %v", err)
+		t.Fatalf("error creating database connection: %v\n", err)
 	}
 	defer db.Close()
 

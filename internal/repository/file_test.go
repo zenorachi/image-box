@@ -10,14 +10,14 @@ import (
 	"time"
 )
 
-func TestTokens_Get(t *testing.T) {
+func TestFiles_Get(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("error creating database connection: %v\n", err)
 	}
 	defer db.Close()
 
-	repo := NewTokens(db)
+	repo := NewFiles(db)
 
 	type args struct {
 		token string
@@ -75,14 +75,14 @@ func TestTokens_Get(t *testing.T) {
 	}
 }
 
-func TestTokens_Create(t *testing.T) {
+func TestFiles_Create(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("error creating database connection: %v\n", err)
 	}
 	defer db.Close()
 
-	repo := NewTokens(db)
+	repo := NewFiles(db)
 
 	type args struct {
 		token models.RefreshToken
