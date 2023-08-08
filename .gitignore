@@ -9,3 +9,6 @@
 
 # Executable
 app
+
+# Exception
+!internal/app
