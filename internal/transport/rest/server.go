@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 )
 
@@ -32,6 +34,7 @@ func (s *Server) setupRoutes(router *gin.Engine, h Handler) {
 	router.POST("/upload", h.CheckToken(), h.CheckUploadInput(), h.upload)
 	router.GET("/refresh", h.refresh)
 	router.GET("/files", h.CheckToken(), h.get)
+	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 }
 
 func (s *Server) Run() error {

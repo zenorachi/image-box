@@ -3,7 +3,7 @@ ImageBox is a service that is used to upload files that are uploaded to an exter
 
 #### Technologies used:
 * [Golang](https://go.dev), [PostgreSQL](https://www.postgresql.org/)
-* [REST](https://ru.wikipedia.org/wiki/REST)
+* [REST](https://ru.wikipedia.org/wiki/REST), [Swagger UI](https://swagger.io/tools/swagger-ui/)
 * [JWT Authentication](https://jwt.io/)
 * [MinIO](https://min.io/)
 ---

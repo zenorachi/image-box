@@ -10,6 +10,11 @@ import (
 	"net/http"
 )
 
+// signUp registers a new user
+//
+// @Summary User registration
+// @Description Sign Up
+// @Tags User's auth
 func (h *handler) signUp(ctx *gin.Context) {
 	inputBodySignUp, _ := ctx.Get(inputSignUp)
 	input, _ := inputBodySignUp.(models.SignUpInput)
