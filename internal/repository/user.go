@@ -24,9 +24,9 @@ func (u *Users) Create(ctx *gin.Context, user models.User) error {
 
 func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (models.User, error) {
 	var user models.User
-	err := u.db.QueryRow("SELECT id, login, password, email, registered_at FROM users "+
+	err := u.db.QueryRow("SELECT id, login, email, password, registered_at FROM users "+
 		"WHERE login = $1 AND password = $2", login, password).
-		Scan(&user.ID, &user.Login, &user.Password, &user.Email, &user.RegisteredAt)
+		Scan(&user.ID, &user.Login, &user.Email, &user.Password, &user.RegisteredAt)
 
 	return user, err
 }
