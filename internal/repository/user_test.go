@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
 	"github.com/zenorachi/image-box/models"
@@ -9,7 +10,7 @@ import (
 	"time"
 )
 
-func TestGetUser(t *testing.T) {
+func TestUsers_Get(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("error creating database connection: %v", err)
@@ -52,6 +53,21 @@ func TestGetUser(t *testing.T) {
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.login, args.password).WillReturnRows(rows)
 			},
 		},
+		{
+			name: "NO ROWS",
+			args: args{
+				login:    "hello",
+				password: "world",
+			},
+			user: models.User{},
+			mockBehaviour: func(args args) {
+				rows := sqlmock.NewRows([]string{"id", "login", "email", "password", "registered_at"})
+
+				expectedQuery := "SELECT id, login, email, password, registered_at FROM users WHERE login = $1 AND password = $2"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.login, args.password).WillReturnRows(rows)
+			},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
@@ -67,5 +83,75 @@ func TestGetUser(t *testing.T) {
 			}
 		})
 	}
+}
 
+func TestUsers_Create(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("error creating database connection: %v", err)
+	}
+	defer db.Close()
+
+	repo := NewUsers(db)
+
+	type args struct {
+		user models.User
+	}
+	type mockBehaviour func(args args)
+
+	tests := []struct {
+		name          string
+		args          args
+		mockBehaviour mockBehaviour
+		wantErr       bool
+	}{
+		{
+			name: "OK",
+			args: args{
+				user: models.User{
+					ID:           1,
+					Login:        "user",
+					Email:        "email@go.dev",
+					Password:     "password",
+					RegisteredAt: time.Now().Round(time.Second),
+				},
+			},
+			mockBehaviour: func(args args) {
+				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
+				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
+					WithArgs(args.user.Login, args.user.Email, args.user.Password, time.Now().Round(time.Second)).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+		},
+		{
+			name: "ERROR",
+			args: args{
+				user: models.User{
+					ID:           1,
+					Login:        "user",
+					Email:        "email@go.dev",
+					Password:     "password",
+					RegisteredAt: time.Now().Round(time.Second),
+				},
+			},
+			mockBehaviour: func(args args) {
+				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
+				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).WithArgs(args.user.Login, args.user.Email, args.user.Password, args.user.RegisteredAt).WillReturnError(fmt.Errorf("test error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockBehaviour(tt.args)
+			err := repo.Create(nil, tt.args.user)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
 }
