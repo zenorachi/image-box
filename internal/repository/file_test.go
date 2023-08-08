@@ -20,7 +20,7 @@ func TestFiles_Get(t *testing.T) {
 	repo := NewFiles(db)
 
 	type args struct {
-		token string
+		userID uint
 	}
 	type mockBehaviour func(args args)
 
@@ -33,28 +33,28 @@ func TestFiles_Get(t *testing.T) {
 		{
 			name: "OK",
 			args: args{
-				token: "token",
+				userID: 3,
 			},
 			mockBehaviour: func(args args) {
-				rows := sqlmock.NewRows([]string{"id", "user_id", "token", "expires_at"}).
-					AddRow(1, "2", "token", time.Now().Round(time.Second))
+				rows := sqlmock.NewRows([]string{"id", "user_id", "name", "url", "size", "uploaded_at"}).
+					AddRow(1, 3, "file", "file.com", 134, time.Now().Round(time.Second))
 
-				expectedQuery := "SELECT id, user_id, token, expires_at FROM refresh_tokens WHERE token = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.token).WillReturnRows(rows)
-
-				expectedExec := "DELETE FROM refresh_tokens WHERE token = $1"
-				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).WithArgs(args.token).WillReturnResult(sqlmock.NewResult(1, 1))
+				expectedQuery := "SELECT id, user_id, name, url, size, uploaded_at " +
+					"FROM files " +
+					"WHERE user_id = $1"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+					WithArgs(args.userID).WillReturnRows(rows)
 			},
 		},
 		{
 			name: "ERROR",
 			args: args{},
 			mockBehaviour: func(args args) {
-				expectedQuery := "SELECT id, user_id, token, expires_at FROM refresh_tokens WHERE token = $1"
-				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.token).WillReturnError(errors.New("test error"))
-
-				expectedExec := "DELETE FROM refresh_tokens WHERE token = $1"
-				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).WithArgs(args.token).WillReturnResult(sqlmock.NewResult(1, 1))
+				expectedQuery := "SELECT id, user_id, name, url, size, uploaded_at " +
+					"FROM files " +
+					"WHERE user_id = $1"
+				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+					WithArgs(args.userID).WillReturnError(errors.New("test error"))
 			},
 			wantErr: true,
 		},
@@ -63,13 +63,13 @@ func TestFiles_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			token, err := repo.Get(nil, tt.args.token)
+			file, err := repo.Get(nil, tt.args.userID)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
-				assert.Equal(t, tt.args.token, token.Token)
+				assert.Equal(t, tt.args.userID, file[0].UserID)
 			}
 		})
 	}
@@ -85,7 +85,7 @@ func TestFiles_Create(t *testing.T) {
 	repo := NewFiles(db)
 
 	type args struct {
-		token models.RefreshToken
+		file models.File
 	}
 	type mockBehaviour func(args args)
 
@@ -98,17 +98,20 @@ func TestFiles_Create(t *testing.T) {
 		{
 			name: "OK",
 			args: args{
-				token: models.RefreshToken{
-					ID:        1,
-					UserID:    2,
-					Token:     "token",
-					ExpiresAt: time.Now().Round(time.Second),
+				models.File{
+					ID:         1,
+					UserID:     3,
+					Name:       "file",
+					URL:        "file.com",
+					Size:       143,
+					UploadedAt: time.Now().Round(time.Second),
 				},
 			},
 			mockBehaviour: func(args args) {
-				expectedExec := "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)"
+				expectedExec := "INSERT INTO files (user_id, name, url, size, uploaded_at) " +
+					"VALUES ($1, $2, $3, $4, $5)"
 				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
-					WithArgs(args.token.UserID, args.token.Token, args.token.ExpiresAt).
+					WithArgs(args.file.UserID, args.file.Name, args.file.URL, args.file.Size, args.file.UploadedAt).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 		},
@@ -116,9 +119,10 @@ func TestFiles_Create(t *testing.T) {
 			name: "ERROR",
 			args: args{},
 			mockBehaviour: func(args args) {
-				expectedExec := "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)"
+				expectedExec := "INSERT INTO files (user_id, name, url, size, uploaded_at) " +
+					"VALUES ($1, $2, $3, $4, $5)"
 				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
-					WithArgs(args.token.UserID, args.token.Token, args.token.ExpiresAt).
+					WithArgs(args.file.UserID, args.file.Name, args.file.URL, args.file.Size, args.file.UploadedAt).
 					WillReturnError(errors.New("test error"))
 			},
 			wantErr: true,
@@ -128,7 +132,7 @@ func TestFiles_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			err := repo.Create(nil, tt.args.token)
+			err := repo.Create(nil, tt.args.file)
 
 			if tt.wantErr {
 				assert.Error(t, err)
