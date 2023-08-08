@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/stretchr/testify/assert"
+	"github.com/zenorachi/image-box/models"
 	"regexp"
 	"testing"
 	"time"
@@ -47,9 +48,7 @@ func TestTokens_Get(t *testing.T) {
 		},
 		{
 			name: "ERROR",
-			args: args{
-				token: "token",
-			},
+			args: args{},
 			mockBehaviour: func(args args) {
 				expectedQuery := "SELECT id, user_id, token, expires_at FROM refresh_tokens WHERE token = $1"
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.token).WillReturnError(errors.New("test error"))
@@ -76,73 +75,66 @@ func TestTokens_Get(t *testing.T) {
 	}
 }
 
-//func TestTokens_Creates_Create(t *testing.T) {
-//	db, mock, err := sqlmock.New()
-//	if err != nil {
-//		t.Fatalf("error creating database connection: %v", err)
-//	}
-//	defer db.Close()
-//
-//	repo := NewUsers(db)
-//
-//	type args struct {
-//		user models.User
-//	}
-//	type mockBehaviour func(args args)
-//
-//	tests := []struct {
-//		name          string
-//		args          args
-//		mockBehaviour mockBehaviour
-//		wantErr       bool
-//	}{
-//		{
-//			name: "OK",
-//			args: args{
-//				user: models.User{
-//					ID:           1,
-//					Login:        "user",
-//					Email:        "email@go.dev",
-//					Password:     "password",
-//					RegisteredAt: time.Now().Round(time.Second),
-//				},
-//			},
-//			mockBehaviour: func(args args) {
-//				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
-//				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
-//					WithArgs(args.user.Login, args.user.Email, args.user.Password, time.Now().Round(time.Second)).
-//					WillReturnResult(sqlmock.NewResult(1, 1))
-//			},
-//		},
-//		{
-//			name: "ERROR",
-//			args: args{
-//				user: models.User{
-//					ID:           1,
-//					Login:        "user",
-//					Email:        "email@go.dev",
-//					Password:     "password",
-//					RegisteredAt: time.Now().Round(time.Second),
-//				},
-//			},
-//			mockBehaviour: func(args args) {
-//				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
-//				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).WithArgs(args.user.Login, args.user.Email, args.user.Password, args.user.RegisteredAt).WillReturnError(fmt.Errorf("test error"))
-//			},
-//			wantErr: true,
-//		},
-//	}
-//
-//	for _, tt := range tests {
-//		t.Run(tt.name, func(t *testing.T) {
-//			tt.mockBehaviour(tt.args)
-//			err := repo.Create(nil, tt.args.user)
-//
-//			if tt.wantErr {
-//				assert.Error(t, err)
-//			} else {
-//				assert.NoError(t, err)
-//			}
-//		})
-//	}
-//}
+func TestTokens_Create(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("error creating database connection: %v", err)
+	}
+	defer db.Close()
+
+	repo := NewTokens(db)
+
+	type args struct {
+		token models.RefreshToken
+	}
+	type mockBehaviour func(args args)
+
+	tests := []struct {
+		name          string
+		args          args
+		mockBehaviour mockBehaviour
+		wantErr       bool
+	}{
+		{
+			name: "OK",
+			args: args{
+				token: models.RefreshToken{
+					ID:        1,
+					UserID:    2,
+					Token:     "token",
+					ExpiresAt: time.Now().Round(time.Second),
+				},
+			},
+			mockBehaviour: func(args args) {
+				expectedExec := "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)"
+				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
+					WithArgs(args.token.UserID, args.token.Token, args.token.ExpiresAt).
+					WillReturnResult(sqlmock.NewResult(1, 1))
+			},
+		},
+		{
+			name: "ERROR",
+			args: args{},
+			mockBehaviour: func(args args) {
+				expectedExec := "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)"
+				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
+					WithArgs(args.token.UserID, args.token.Token, args.token.ExpiresAt).
+					WillReturnError(errors.New("test error"))
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.mockBehaviour(tt.args)
+			err := repo.Create(nil, tt.args.token)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+		})
+	}
+}

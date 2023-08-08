@@ -15,7 +15,7 @@ stop:
 
 test:
 	go test -coverprofile=$(COVER_FILE) -v ./...
-	make test-coverage
+	make --silent test-coverage
 
 test-coverage:
 	go tool cover -func=cover.out | grep "total"

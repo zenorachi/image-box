@@ -126,13 +126,7 @@ func TestUsers_Create(t *testing.T) {
 		{
 			name: "ERROR",
 			args: args{
-				user: models.User{
-					ID:           1,
-					Login:        "user",
-					Email:        "email@go.dev",
-					Password:     "password",
-					RegisteredAt: time.Now().Round(time.Second),
-				},
+				user: models.User{},
 			},
 			mockBehaviour: func(args args) {
 				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"

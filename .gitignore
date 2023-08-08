@@ -10,5 +10,8 @@
 # Executable
 app
 
+# Testing
+cover.out
+
 # Exception
 !internal/app
