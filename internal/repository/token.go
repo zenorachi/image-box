@@ -15,7 +15,7 @@ func NewTokens(db *sql.DB) *Tokens {
 }
 
 func (t *Tokens) Create(ctx *gin.Context, token models.RefreshToken) error {
-	_, err := t.db.Exec("INSERT INTO refresh_tokens (user_id, token, expires_at) "+
+	_, err := t.db.ExecContext(ctx, "INSERT INTO refresh_tokens (user_id, token, expires_at) "+
 		"VALUES ($1, $2, $3)", token.UserID, token.Token, token.ExpiresAt)
 
 	return err
@@ -23,7 +23,7 @@ func (t *Tokens) Create(ctx *gin.Context, token models.RefreshToken) error {
 
 func (t *Tokens) Get(ctx *gin.Context, token string) (models.RefreshToken, error) {
 	var refreshToken models.RefreshToken
-	err := t.db.QueryRow("SELECT id, user_id, token, expires_at FROM refresh_tokens "+
+	err := t.db.QueryRowContext(ctx, "SELECT id, user_id, token, expires_at FROM refresh_tokens "+
 		"WHERE token = $1", token).
 		Scan(&refreshToken.ID, &refreshToken.UserID, &refreshToken.Token, &refreshToken.ExpiresAt)
 

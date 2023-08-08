@@ -17,7 +17,7 @@ func NewFiles(db *sql.DB) *Files {
 }
 
 func (f *Files) Create(ctx *gin.Context, file models.File) error {
-	_, err := f.db.Exec("INSERT INTO files (user_id, name, url, size, uploaded_at) "+
+	_, err := f.db.ExecContext(ctx, "INSERT INTO files (user_id, name, url, size, uploaded_at) "+
 		"VALUES ($1, $2, $3, $4, $5)",
 		file.UserID, file.Name, file.URL, file.Size, file.UploadedAt)
 
@@ -26,7 +26,7 @@ func (f *Files) Create(ctx *gin.Context, file models.File) error {
 
 func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 	var files []models.File
-	rows, err := f.db.Query("SELECT id, user_id, name, url, size, uploaded_at "+
+	rows, err := f.db.QueryContext(ctx, "SELECT id, user_id, name, url, size, uploaded_at "+
 		"FROM files "+
 		"WHERE user_id = $1", userID)
 	if err != nil {

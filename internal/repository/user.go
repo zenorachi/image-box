@@ -15,7 +15,7 @@ func NewUsers(db *sql.DB) *Users {
 }
 
 func (u *Users) Create(ctx *gin.Context, user models.User) error {
-	_, err := u.db.Exec("INSERT INTO users (login, email, password, registered_at) "+
+	_, err := u.db.ExecContext(ctx, "INSERT INTO users (login, email, password, registered_at) "+
 		"VALUES ($1, $2, $3, $4)",
 		user.Login, user.Email, user.Password, user.RegisteredAt)
 
@@ -24,7 +24,7 @@ func (u *Users) Create(ctx *gin.Context, user models.User) error {
 
 func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (models.User, error) {
 	var user models.User
-	err := u.db.QueryRow("SELECT id, login, email, password, registered_at FROM users "+
+	err := u.db.QueryRowContext(ctx, "SELECT id, login, email, password, registered_at FROM users "+
 		"WHERE login = $1 AND password = $2", login, password).
 		Scan(&user.ID, &user.Login, &user.Email, &user.Password, &user.RegisteredAt)
 
