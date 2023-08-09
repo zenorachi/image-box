@@ -1,8 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "zenorachi's ImageBox server.",
+        "title": "ImageBox API",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "localhost:8080",
+    "basePath": "/",
     "paths": {
         "/auth": {
             "post": {
@@ -26,6 +31,13 @@
                     }
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "UsersAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

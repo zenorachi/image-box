@@ -6,7 +6,7 @@ WORKDIR /root
 COPY ./ ./
 
 # Build application
-RUN go build ./cmd/app/
+RUN go mod download && go build ./cmd/app/
 
 # Stage 2: Create the final Docker image
 FROM alpine:latest

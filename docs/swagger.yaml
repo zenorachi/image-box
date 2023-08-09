@@ -1,5 +1,10 @@
+basePath: /
+host: localhost:8080
 info:
   contact: {}
+  description: zenorachi's ImageBox server.
+  title: ImageBox API
+  version: "1.0"
 paths:
   /auth:
     post:
@@ -16,4 +21,9 @@ paths:
       summary: User registration
       tags:
       - auth
+securityDefinitions:
+  UsersAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -31,6 +31,11 @@ func (h *handler) get(ctx *gin.Context) {
 	userID := userIdCtx.(uint)
 
 	files, err := h.fileService.Get(ctx, userID)
+	if files == nil {
+		ctx.JSON(http.StatusNoContent, gin.H{"error": service.FilesNotFound})
+		return
+	}
+
 	if err != nil {
 		logger.LogError(logger.GetFilesHandler, err)
 		if errors.Is(err, service.FilesNotFound) {

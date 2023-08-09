@@ -8,6 +8,7 @@ import (
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 	"github.com/sirupsen/logrus"
+	_ "github.com/zenorachi/image-box/docs"
 	"github.com/zenorachi/image-box/internal/config"
 	"github.com/zenorachi/image-box/internal/repository"
 	"github.com/zenorachi/image-box/internal/service"
