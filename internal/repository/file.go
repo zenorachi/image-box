@@ -17,19 +17,40 @@ func NewFiles(db *sql.DB) *Files {
 }
 
 func (f *Files) Create(ctx *gin.Context, file models.File) error {
-	_, err := f.db.Exec("INSERT INTO files (user_id, name, url, size, uploaded_at) "+
+	tx, err := f.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelSerializable,
+		ReadOnly:  false,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO files (user_id, name, url, size, uploaded_at) "+
 		"VALUES ($1, $2, $3, $4, $5)",
 		file.UserID, file.Name, file.URL, file.Size, file.UploadedAt)
+	if err != nil {
+		tx.Rollback()
+	}
 
-	return err
+	return tx.Commit()
 }
 
 func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 	var files []models.File
-	rows, err := f.db.Query("SELECT id, user_id, name, url, size, uploaded_at "+
+
+	tx, err := f.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelSerializable,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return []models.File{}, err
+	}
+
+	rows, err := tx.QueryContext(ctx, "SELECT id, user_id, name, url, size, uploaded_at "+
 		"FROM files "+
 		"WHERE user_id = $1", userID)
 	if err != nil {
+		tx.Rollback()
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, service.FilesNotFound
 		}
@@ -45,5 +66,5 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 		files = append(files, file)
 	}
 
-	return files, nil
+	return files, tx.Commit()
 }

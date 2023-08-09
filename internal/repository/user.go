@@ -15,18 +15,43 @@ func NewUsers(db *sql.DB) *Users {
 }
 
 func (u *Users) Create(ctx *gin.Context, user models.User) error {
-	_, err := u.db.Exec("INSERT INTO users (login, email, password, registered_at) "+
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelSerializable,
+		ReadOnly:  false,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = tx.ExecContext(ctx, "INSERT INTO users (login, email, password, registered_at) "+
 		"VALUES ($1, $2, $3, $4)",
 		user.Login, user.Email, user.Password, user.RegisteredAt)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
 
-	return err
+	return tx.Commit()
 }
 
 func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (models.User, error) {
 	var user models.User
-	err := u.db.QueryRow("SELECT id, login, password, email, registered_at FROM users "+
-		"WHERE login = $1 AND password = $2", login, password).
-		Scan(&user.ID, &user.Login, &user.Password, &user.Email, &user.RegisteredAt)
 
-	return user, err
+	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{
+		Isolation: sql.LevelSerializable,
+		ReadOnly:  true,
+	})
+	if err != nil {
+		return models.User{}, err
+	}
+
+	err = tx.QueryRowContext(ctx, "SELECT id, login, email, password, registered_at FROM users "+
+		"WHERE login = $1 AND password = $2", login, password).
+		Scan(&user.ID, &user.Login, &user.Email, &user.Password, &user.RegisteredAt)
+	if err != nil {
+		tx.Rollback()
+		return models.User{}, err
+	}
+
+	return user, tx.Commit()
 }

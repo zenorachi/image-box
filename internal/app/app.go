@@ -21,6 +21,17 @@ import (
 	"syscall"
 )
 
+// @title           ImageBox API
+// @version         1.0
+// @description     zenorachi's ImageBox server.
+
+// @host      localhost:8080
+// @BasePath  /
+
+// @securityDefinitions.apikey UsersAuth
+// @in header
+// @name Authorization
+
 func init() {
 	// Gin Setup
 	gin.SetMode(gin.ReleaseMode)
@@ -33,24 +44,29 @@ func init() {
 }
 
 func Run(configDir, configFile, envFile string) error {
+	// Setup GIN's mode
 	gin.SetMode(gin.ReleaseMode)
 
+	// CONFIG
 	cfg, err := initConfig(configDir, configFile, envFile)
 	if err != nil {
 		return err
 	}
 
+	// DB
 	db, err := postgres.NewDB(cfg.DB)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
+	// MINIO CLIENT
 	minioClient, err := initMinioClient(cfg)
 	if err != nil {
 		return err
 	}
 
+	// CREATE BUCKET
 	if isExist, _ := minioClient.BucketExists(context.Background(), cfg.Minio.Bucket); !isExist {
 		err = minioClient.MakeBucket(context.Background(), cfg.Minio.Bucket, minio.MakeBucketOptions{
 			Region: "eu-central-1",
@@ -60,11 +76,13 @@ func Run(configDir, configFile, envFile string) error {
 		}
 	}
 
+	// FILE'S STORAGE
 	provider, err := initStorage(minioClient, cfg)
 	if err != nil {
 		return err
 	}
 
+	// HANDLER
 	handler := initHandler(cfg, provider, db)
 	server := rest.NewServer(handler, cfg.Server.Host, cfg.Server.Port)
 	go func() {
@@ -74,15 +92,13 @@ func Run(configDir, configFile, envFile string) error {
 	}()
 	logrus.Infoln("server is running")
 
+	// GRACEFUL SHUTDOWN
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, syscall.SIGINT, syscall.SIGTERM)
-
-	// Waiting for CTRL+C
 	<-stop
 	logrus.Infoln("shutdown gracefully...")
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-
 	if err := server.Shutdown(ctx); err != nil {
 		return err
 	}

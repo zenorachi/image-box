@@ -1,0 +1,19 @@
+info:
+  contact: {}
+paths:
+  /auth:
+    post:
+      consumes:
+      - application/json
+      description: signUp registers a new user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: User registration
+      tags:
+      - auth
+swagger: "2.0"
