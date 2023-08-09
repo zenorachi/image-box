@@ -4,6 +4,9 @@
 
 COVER_FILE=cover.out
 
+MOCK_SRC=./internal/transport/rest/handler.go
+MOCK_DST=./internal/mocks/mocks.go
+
 build:
 	docker-compose up --build
 
@@ -12,6 +15,9 @@ run:
 
 stop:
 	docker-compose down
+
+lint:
+	golangci-lint run
 
 test:
 	go test -coverprofile=$(COVER_FILE) -v ./...
@@ -23,5 +29,6 @@ test-coverage:
 clean:
 	rm -rf $(COVER_FILE)
 
-lint:
-	golangci-lint run
+mock-gen:
+	mockgen -source=$(MOCK_SRC) -destination=$(MOCK_DST)
+

@@ -1,14 +1,19 @@
-basePath: /
-host: localhost:8080
 info:
   contact: {}
-  description: rvinnie's ChatGPT server.
-  title: GPT API
-  version: "1.0"
-paths: {}
-securityDefinitions:
-  UsersAuth:
-    in: header
-    name: Authorization
-    type: apiKey
+paths:
+  /auth:
+    post:
+      consumes:
+      - application/json
+      description: signUp registers a new user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: User registration
+      tags:
+      - auth
 swagger: "2.0"

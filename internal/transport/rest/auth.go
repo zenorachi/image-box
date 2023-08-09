@@ -10,11 +10,13 @@ import (
 	"net/http"
 )
 
-// signUp registers a new user
-//
 // @Summary User registration
-// @Description Sign Up
-// @Tags User's auth
+// @Tags auth
+// @Description signUp registers a new user
+// @Accept  json
+// @Produce  json
+// @Success 200 {string} string "ok"
+// @Router /auth [post]
 func (h *handler) signUp(ctx *gin.Context) {
 	inputBodySignUp, _ := ctx.Get(inputSignUp)
 	input, _ := inputBodySignUp.(models.SignUpInput)

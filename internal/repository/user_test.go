@@ -3,6 +3,7 @@ package repository
 import (
 	"fmt"
 	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/zenorachi/image-box/models"
 	"regexp"
@@ -46,25 +47,32 @@ func TestUsers_Get(t *testing.T) {
 				RegisteredAt: time.Now().Round(time.Second),
 			},
 			mockBehaviour: func(args args) {
+				mock.ExpectBegin()
+
 				rows := sqlmock.NewRows([]string{"id", "login", "email", "password", "registered_at"}).
 					AddRow(1, "login", "user-email", "password", time.Now().Round(time.Second))
 
 				expectedQuery := "SELECT id, login, email, password, registered_at FROM users WHERE login = $1 AND password = $2"
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.login, args.password).WillReturnRows(rows)
+
+				mock.ExpectCommit()
 			},
 		},
 		{
-			name: "NO ROWS",
+			name: "ERROR",
 			args: args{
 				login:    "hello",
 				password: "world",
 			},
 			user: models.User{},
 			mockBehaviour: func(args args) {
-				rows := sqlmock.NewRows([]string{"id", "login", "email", "password", "registered_at"})
+				mock.ExpectBegin()
 
+				rows := sqlmock.NewRows([]string{"id", "login", "email", "password", "registered_at"})
 				expectedQuery := "SELECT id, login, email, password, registered_at FROM users WHERE login = $1 AND password = $2"
 				mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WithArgs(args.login, args.password).WillReturnRows(rows)
+
+				mock.ExpectRollback()
 			},
 			wantErr: true,
 		},
@@ -73,7 +81,7 @@ func TestUsers_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			user, err := repo.GetByCredentials(nil, tt.args.login, tt.args.password)
+			user, err := repo.GetByCredentials(&gin.Context{}, tt.args.login, tt.args.password)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -117,10 +125,14 @@ func TestUsers_Create(t *testing.T) {
 				},
 			},
 			mockBehaviour: func(args args) {
+				mock.ExpectBegin()
+
 				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
 				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
-					WithArgs(args.user.Login, args.user.Email, args.user.Password, time.Now().Round(time.Second)).
+					WithArgs(args.user.Login, args.user.Email, args.user.Password, args.user.RegisteredAt).
 					WillReturnResult(sqlmock.NewResult(1, 1))
+
+				mock.ExpectCommit()
 			},
 		},
 		{
@@ -129,8 +141,14 @@ func TestUsers_Create(t *testing.T) {
 				user: models.User{},
 			},
 			mockBehaviour: func(args args) {
+				mock.ExpectBegin()
+
 				expectedExec := "INSERT INTO users (login, email, password, registered_at) VALUES ($1, $2, $3, $4)"
-				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).WithArgs(args.user.Login, args.user.Email, args.user.Password, args.user.RegisteredAt).WillReturnError(fmt.Errorf("test error"))
+				mock.ExpectExec(regexp.QuoteMeta(expectedExec)).
+					WithArgs(args.user.Login, args.user.Email, args.user.Password, args.user.RegisteredAt).
+					WillReturnError(fmt.Errorf("test error"))
+
+				mock.ExpectRollback()
 			},
 			wantErr: true,
 		},
@@ -139,7 +157,7 @@ func TestUsers_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tt.mockBehaviour(tt.args)
-			err := repo.Create(nil, tt.args.user)
+			err := repo.Create(&gin.Context{}, tt.args.user)
 
 			if tt.wantErr {
 				assert.Error(t, err)

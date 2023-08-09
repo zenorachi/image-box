@@ -29,11 +29,14 @@ func NewServer(h Handler, host string, port int) *Server {
 }
 
 func (s *Server) setupRoutes(router *gin.Engine, h Handler) {
-	router.POST("/sign-up", h.CheckBody(), h.CheckJSONSignUp(), h.signUp)
-	router.POST("/sign-in", h.CheckBody(), h.CheckJSONSignIn(), h.signIn)
-	router.POST("/upload", h.CheckToken(), h.CheckUploadInput(), h.upload)
-	router.GET("/refresh", h.refresh)
-	router.GET("/files", h.CheckToken(), h.get)
+	router.GET("/ping", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "pong")
+	})
+	router.POST("/auth/sign-up", h.CheckBody(), h.CheckJSONSignUp(), h.signUp)
+	router.POST("/auth/sign-in", h.CheckBody(), h.CheckJSONSignIn(), h.signIn)
+	router.GET("/auth/refresh", h.refresh)
+	router.POST("/storage/upload", h.CheckToken(), h.CheckUploadInput(), h.upload)
+	router.GET("/storage/files", h.CheckToken(), h.get)
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swagFiles.Handler))
 }
 
