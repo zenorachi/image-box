@@ -7,6 +7,7 @@ import (
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/pkg/storage"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -30,6 +31,12 @@ func (h *handler) get(ctx *gin.Context) {
 	userIdCtx, _ := ctx.Get("userID")
 	userID := userIdCtx.(uint)
 
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error"})
+	}
+	pageSize := 3
+
 	files, err := h.fileService.Get(ctx, userID)
 	if files == nil {
 		ctx.JSON(http.StatusNoContent, gin.H{"error": service.FilesNotFound})
@@ -52,5 +59,13 @@ func (h *handler) get(ctx *gin.Context) {
 		files[i] = file
 	}
 
-	ctx.JSON(http.StatusOK, files)
+	startIndex := (page - 1) * pageSize
+	endIndex := startIndex + pageSize
+	if endIndex > len(files) {
+		endIndex = len(files)
+	}
+
+	pagedFiles := files[startIndex:endIndex]
+
+	ctx.JSON(http.StatusOK, pagedFiles)
 }
