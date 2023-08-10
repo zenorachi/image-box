@@ -15,8 +15,11 @@ import (
 // @Description signUp registers a new user
 // @Accept  json
 // @Produce  json
-// @Success 200 {string} string "ok"
-// @Router /auth [post]
+// @Param input body models.SignUpInput true "sign up info"
+// @Success 200 {object} string
+// @Failure 400 {object} error
+// @Failure 500 {object} error
+// @Router /auth/sign-up [post]
 func (h *handler) signUp(ctx *gin.Context) {
 	inputBodySignUp, _ := ctx.Get(inputSignUp)
 	input, _ := inputBodySignUp.(models.SignUpInput)
@@ -36,6 +39,17 @@ func (h *handler) signUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "sign up successful!"})
 }
 
+// @Summary User authentication
+// @Tags auth
+// @Description signIn returns JWT token
+// @Accept  json
+// @Produce  json
+// @Param input body models.SignInInput true "sign in info"
+// @Success 200 {object} string
+// @Failure 400 {object} error
+// @Failure 401 {object} error
+// @Failure 500 {object} error
+// @Router /auth/sign-in [post]
 func (h *handler) signIn(ctx *gin.Context) {
 	inputBodySignIn, _ := ctx.Get(inputSignIn)
 	input, _ := inputBodySignIn.(models.SignInInput)
@@ -61,6 +75,16 @@ func (h *handler) signIn(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"token": accessToken})
 }
 
+// @Summary Refresh JWT
+// @Tags auth
+// @Description refresh returns a new JWT token
+// @Accept  json
+// @Produce  json
+// @HeaderParam Set-Cookie string true "RefreshToken"
+// @Success 200 {object} string
+// @Failure 400 {object} error
+// @Failure 500 {object} error
+// @Router /auth/refresh [get]
 func (h *handler) refresh(ctx *gin.Context) {
 	cookie, err := ctx.Cookie("refresh-token")
 	if err != nil {

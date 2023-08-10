@@ -16,7 +16,7 @@ func (h *handler) CheckBody() gin.HandlerFunc {
 		body, err := io.ReadAll(ctx.Request.Body)
 		if err != nil {
 			logger.LogError(logger.AuthMiddleware, err)
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err})
+			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "unexpected error"})
 		}
 
 		ctx.Set(requestBody, body)

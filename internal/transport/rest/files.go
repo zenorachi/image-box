@@ -11,6 +11,18 @@ import (
 	"strings"
 )
 
+// @Summary Uploading a file to the storage
+// @Tags storage
+// @Description uploading a file to the minio storage
+// @Security Auth
+// @Accept  json
+// @Produce  json
+// @Param Authorization header string true "Bearer <token>" default("Bearer ")
+// @Param file formData file true "File to upload"
+// @Success 201 {object} string
+// @Failure 400 {object} error
+// @Failure 500 {object} string
+// @Router /storage/upload [post]
 func (h *handler) upload(ctx *gin.Context) {
 	upload, _ := ctx.Get(uploadFile)
 	uploadInput := upload.(storage.UploadInput)
@@ -27,6 +39,18 @@ func (h *handler) upload(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"message": "file uploaded successful"})
 }
 
+// @Summary Get list of files
+// @Tags storage
+// @Description get list of files for one user
+// @Security Auth
+// @Accept json
+// @Produce  json
+// @Param Authorization header string true "Bearer <token>" default("Bearer ")
+// @Success 200 {object} []models.File
+// @Success 204 {object} string
+// @Failure 400 {object} string
+// @Failure 500 {object} string
+// @Router /storage/get [get]
 func (h *handler) get(ctx *gin.Context) {
 	userIdCtx, _ := ctx.Get("userID")
 	userID := userIdCtx.(uint)

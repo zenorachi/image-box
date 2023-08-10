@@ -12,6 +12,9 @@ COPY ./configs/main.yml /root/configs/main.yml
 # Copy wait-db.sh
 COPY ./scripts/database/wait-db.sh /root/
 
+# Copy docs
+COPY ./docs /root/docs
+
 # Install psql-client
 RUN apk add --no-cache postgresql-client
 

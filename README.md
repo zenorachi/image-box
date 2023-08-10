@@ -35,7 +35,8 @@ export HASH_SALT=
 export HASH_SECRET=
 ```
 > **Note:** if you build the project using Docker, setup *DB_HOST=db* (as the container name)
-3. Compile and build the project:
+3. Compile and run the project:
 ```shell
-make build
+make
 ```
+4. Go to `http://localhost:8080/docs/index.html` and test the ImageBox API.

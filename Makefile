@@ -32,6 +32,8 @@ test-coverage:
 clean:
 	rm -rf $(COVER_FILE)
 
+swag:
+	swag init -g ./internal/app/app.go
+
 mock-gen:
 	mockgen -source=$(MOCK_SRC) -destination=$(MOCK_DST)
-
