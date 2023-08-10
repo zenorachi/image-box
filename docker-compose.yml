@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  app:
+    build: ./
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - minio
+    networks:
+      - devdzen
+
+  nginx:
+    image: nginx
+    ports:
+      - "8081:80"
+      - "443:443"
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - app
+    networks:
+      - devdzen
+
+  minio:
+    image: minio/minio
+    command: minio server --console-address ":9001" /data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env
+    volumes:
+      - minio_data:/data
+    networks:
+      - devdzen
+
+  db:
+    restart: on-failure
+    image: postgres:latest
+    ports:
+      - "5436:5432"
+    env_file:
+      - .env
+    volumes:
+      - ./scripts/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - devdzen
+
+networks:
+  devdzen:
+    driver: bridge
+
+volumes:
+  minio_data:
+  pg_data:

@@ -1,0 +1,17 @@
+linters:
+  disable-all: true
+  enable:
+    - gofmt
+    - govet
+    - staticcheck
+    - unconvert
+    - dupl
+    - ineffassign
+    - errcheck
+    - goconst
+
+run:
+  timeout: 1m
+
+golint:
+  min-confidence: 0.5

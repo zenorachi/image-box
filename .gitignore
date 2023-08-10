@@ -6,6 +6,13 @@
 
 # configs
 .env
+*.pem
 
 # Executable
-image-box-app
+.bin/
+
+# Testing
+cover.out
+
+# Exception
+!internal/app

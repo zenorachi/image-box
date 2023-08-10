@@ -1,0 +1,211 @@
+basePath: /
+definitions:
+  models.File:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      size:
+        type: integer
+      uploadedAt:
+        type: string
+      url:
+        type: string
+      userID:
+        type: integer
+    type: object
+  models.SignInInput:
+    properties:
+      login:
+        minLength: 6
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - login
+    - password
+    type: object
+  models.SignUpInput:
+    properties:
+      email:
+        type: string
+      login:
+        minLength: 6
+        type: string
+      password:
+        minLength: 6
+        type: string
+    required:
+    - email
+    - login
+    - password
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: zenorachi's ImageBox server.
+  title: ImageBox API
+  version: "1.0"
+paths:
+  /auth/refresh:
+    get:
+      consumes:
+      - application/json
+      description: refresh returns a new JWT token
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Refresh JWT
+      tags:
+      - auth
+  /auth/sign-in:
+    post:
+      consumes:
+      - application/json
+      description: signIn returns JWT token
+      parameters:
+      - description: sign in info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignInInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "401":
+          description: Unauthorized
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: User authentication
+      tags:
+      - auth
+  /auth/sign-up:
+    post:
+      consumes:
+      - application/json
+      description: signUp registers a new user
+      parameters:
+      - description: sign up info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignUpInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: User registration
+      tags:
+      - auth
+  /storage/get:
+    get:
+      consumes:
+      - application/json
+      description: get list of files for one user
+      parameters:
+      - default: '"Bearer "'
+        description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.File'
+            type: array
+        "204":
+          description: No Content
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Auth: []
+      summary: Get list of files
+      tags:
+      - storage
+  /storage/upload:
+    post:
+      consumes:
+      - application/json
+      description: uploading a file to the minio storage
+      parameters:
+      - default: '"Bearer "'
+        description: Bearer <token>
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: File to upload
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      security:
+      - Auth: []
+      summary: Uploading a file to the storage
+      tags:
+      - storage
+securityDefinitions:
+  UsersAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
