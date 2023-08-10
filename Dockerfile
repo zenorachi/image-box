@@ -1,27 +1,18 @@
-# Stage 1: Build the Go application with dlv for debugging
-FROM golang:alpine AS build
-
-WORKDIR /root
-
-COPY ./ ./
-
-# Build application
-RUN go mod download && go build ./cmd/app/
-
-# Stage 2: Create the final Docker image
 FROM alpine:latest
 
 WORKDIR /root
 
-# Copy binary from Stage 1
-COPY --from=build /root/app ./
+# Copy binary
+COPY ./.bin/app /root/.bin/app
 
-# Copy configs from Stage 1
-COPY --from=build /root/.env /root/
-COPY --from=build /root/configs/main.yml /root/configs/main.yml
+# Copy configs
+COPY ./.env /root/
+COPY ./configs/main.yml /root/configs/main.yml
 
 # Copy wait-db.sh
-COPY --from=build /root/scripts/database/wait-db.sh /root/
+COPY ./scripts/database/wait-db.sh /root/
 
 # Install psql-client
 RUN apk add --no-cache postgresql-client
+
+CMD ["sh", "-c", "sh wait-db.sh && ./.bin/app"]

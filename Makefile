@@ -1,5 +1,5 @@
 .SILENT:
-.DEFAULT_GOAL: build
+.DEFAULT_GOAL: run
 .PHONY: build run stop test test-coverage lint
 
 COVER_FILE=cover.out
@@ -8,10 +8,13 @@ MOCK_SRC=./internal/transport/rest/handler.go
 MOCK_DST=./internal/mocks/mocks.go
 
 build:
-	docker-compose up --build
+	go mod download && CGO_ENABLED=0 GOOS=linux go build -o ./.bin/app ./cmd/app/main.go
 
-run:
+run: build
 	docker-compose up
+
+rebuild: build
+	docker-compose up --build
 
 stop:
 	docker-compose down

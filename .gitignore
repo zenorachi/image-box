@@ -9,7 +9,7 @@
 *.pem
 
 # Executable
-app
+.bin/
 
 # Testing
 cover.out

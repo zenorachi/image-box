@@ -138,7 +138,9 @@ func initMinioClient(cfg *config.Config) (*minio.Client, error) {
 
 func initStorage(client *minio.Client, cfg *config.Config) (*storage.FileStorage, error) {
 	provider := storage.NewProvider(client, cfg.Minio.Bucket, cfg.Minio.Endpoint)
-	policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::` + cfg.Minio.Bucket + `/*"]}]}`
+	policy := `{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"AWS":["*"]},"Action":["s3:GetObject"],"Resource":["arn:aws:s3:::` +
+		cfg.Minio.Bucket +
+		`/*"]}]}`
 
 	err := client.SetBucketPolicy(context.Background(), cfg.Minio.Bucket, policy)
 	if err != nil {
