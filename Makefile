@@ -30,7 +30,7 @@ test-coverage:
 	go tool cover -func=cover.out | grep "total"
 
 clean:
-	rm -rf $(COVER_FILE)
+	rm -rf ./.bin $(COVER_FILE)
 
 swag:
 	swag init -g ./internal/app/app.go

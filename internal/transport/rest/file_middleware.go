@@ -1,12 +1,25 @@
 package rest
 
 import (
-	"net/http"
-
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/pkg/storage"
+	"net/http"
+	"slices"
 )
+
+const (
+	allowedFileSize        = 10 * 1024 * 1024
+	contentTypeJPEG string = "image/jpeg"
+	contentTypePNG  string = "image/png"
+	contentTypeJPG  string = "image/jpg"
+)
+
+var allowedMimeTypes = []string{
+	contentTypeJPEG,
+	contentTypePNG,
+	contentTypeJPG,
+}
 
 func (h *handler) CheckUploadInput() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -14,6 +27,16 @@ func (h *handler) CheckUploadInput() gin.HandlerFunc {
 		if err != nil {
 			logger.LogError(logger.FilesMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		if file.Size > allowedFileSize {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "file is too large (size exceeds 10MB limit)"})
+			return
+		}
+
+		if !slices.Contains(allowedMimeTypes, file.Header.Get("Content-Type")) {
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid file type (supported types: jpg, jpeg, png)"})
 			return
 		}
 
