@@ -1,18 +1,19 @@
 package rest
 
 import (
+	"net/http"
+	"slices"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/pkg/storage"
-	"net/http"
-	"slices"
 )
 
 const (
-	allowedFileSize        = 10 * 1024 * 1024
-	contentTypeJPEG string = "image/jpeg"
-	contentTypePNG  string = "image/png"
-	contentTypeJPG  string = "image/jpg"
+	allowedFileSize = 10 * 1024 * 1024
+	contentTypeJPEG = "image/jpeg"
+	contentTypePNG  = "image/png"
+	contentTypeJPG  = "image/jpg"
 )
 
 var allowedMimeTypes = []string{
