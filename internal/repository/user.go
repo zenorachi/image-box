@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
 )
@@ -27,7 +28,7 @@ func (u *Users) Create(ctx *gin.Context, user models.User) error {
 		"VALUES ($1, $2, $3, $4)",
 		user.Login, user.Email, user.Password, user.RegisteredAt)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
@@ -49,7 +50,7 @@ func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (mode
 		"WHERE login = $1 AND password = $2", login, password).
 		Scan(&user.ID, &user.Login, &user.Email, &user.Password, &user.RegisteredAt)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return models.User{}, err
 	}
 

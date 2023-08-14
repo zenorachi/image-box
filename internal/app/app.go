@@ -4,6 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+
 	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -16,10 +21,6 @@ import (
 	"github.com/zenorachi/image-box/pkg/database/postgres"
 	"github.com/zenorachi/image-box/pkg/hash"
 	"github.com/zenorachi/image-box/pkg/storage"
-	"net/http"
-	"os"
-	"os/signal"
-	"syscall"
 )
 
 // @title           ImageBox API

@@ -3,11 +3,12 @@ package rest
 import (
 	"errors"
 	"fmt"
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/models"
-	"net/http"
 )
 
 // @Summary User registration

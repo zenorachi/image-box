@@ -2,13 +2,14 @@ package rest
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/pkg/storage"
-	"net/http"
-	"strconv"
-	"strings"
 )
 
 // @Summary Uploading a file to the storage

@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 	"errors"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/models"
@@ -29,7 +30,7 @@ func (f *Files) Create(ctx *gin.Context, file models.File) error {
 		"VALUES ($1, $2, $3, $4, $5)",
 		file.UserID, file.Name, file.URL, file.Size, file.UploadedAt)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 	}
 
 	return tx.Commit()
@@ -50,12 +51,13 @@ func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
 		"FROM files "+
 		"WHERE user_id = $1", userID)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, service.FilesNotFound
 		}
 		return nil, err
 	}
+	defer rows.Close()
 
 	for rows.Next() {
 		var file models.File

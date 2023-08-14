@@ -1,8 +1,9 @@
 package storage
 
 import (
-	"github.com/gin-gonic/gin"
 	"io"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UploadInput struct {

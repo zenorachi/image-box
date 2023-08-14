@@ -1,10 +1,11 @@
 package rest
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/transport/logger"
 	"github.com/zenorachi/image-box/pkg/storage"
-	"net/http"
 )
 
 func (h *handler) CheckUploadInput() gin.HandlerFunc {

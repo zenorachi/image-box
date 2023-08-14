@@ -2,6 +2,7 @@ package repository
 
 import (
 	"database/sql"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
 )
@@ -26,7 +27,7 @@ func (t *Tokens) Create(ctx *gin.Context, token models.RefreshToken) error {
 	_, err = t.db.ExecContext(ctx, "INSERT INTO refresh_tokens (user_id, token, expires_at) "+
 		"VALUES ($1, $2, $3)", token.UserID, token.Token, token.ExpiresAt)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 
@@ -48,13 +49,13 @@ func (t *Tokens) Get(ctx *gin.Context, token string) (models.RefreshToken, error
 		"WHERE token = $1", token).
 		Scan(&refreshToken.ID, &refreshToken.UserID, &refreshToken.Token, &refreshToken.ExpiresAt)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return models.RefreshToken{}, err
 	}
 
 	_, err = t.db.Exec("DELETE FROM refresh_tokens WHERE token = $1", token)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return models.RefreshToken{}, err
 	}
 

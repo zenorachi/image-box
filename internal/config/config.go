@@ -1,11 +1,12 @@
 package config
 
 import (
+	"time"
+
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/spf13/viper"
 	"github.com/zenorachi/image-box/pkg/database/postgres"
-	"time"
 )
 
 type Config struct {

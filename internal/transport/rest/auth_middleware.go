@@ -3,12 +3,13 @@ package rest
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/internal/transport/logger"
-	"github.com/zenorachi/image-box/models"
 	"io"
 	"net/http"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/zenorachi/image-box/internal/transport/logger"
+	"github.com/zenorachi/image-box/models"
 )
 
 func (h *handler) CheckBody() gin.HandlerFunc {

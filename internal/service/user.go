@@ -3,9 +3,10 @@ package service
 import (
 	"database/sql"
 	"errors"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
-	"time"
 )
 
 var UserNotFound = errors.New("user not found")

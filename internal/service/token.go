@@ -4,12 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
-	"github.com/zenorachi/image-box/models"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt"
+	"github.com/zenorachi/image-box/models"
 )
 
 func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {

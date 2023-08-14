@@ -1,11 +1,12 @@
 package config
 
 import (
-	"github.com/joho/godotenv"
-	"github.com/zenorachi/image-box/pkg/database/postgres"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/zenorachi/image-box/pkg/database/postgres"
 )
 
 const (

@@ -2,13 +2,14 @@ package repository
 
 import (
 	"errors"
+	"regexp"
+	"testing"
+	"time"
+
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/zenorachi/image-box/models"
-	"regexp"
-	"testing"
-	"time"
 )
 
 func TestFiles_Get(t *testing.T) {

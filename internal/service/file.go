@@ -2,10 +2,11 @@ package service
 
 import (
 	"errors"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/models"
 	"github.com/zenorachi/image-box/pkg/storage"
-	"time"
 )
 
 var FilesNotFound = errors.New("files not found")
