@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/logger"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 // @Summary User registration
@@ -16,14 +16,14 @@ import (
 // @Description signUp registers a new user
 // @Accept  json
 // @Produce  json
-// @Param input body models.SignUpInput true "sign up info"
+// @Param input body model.SignUpInput true "sign up info"
 // @Success 200 {object} string
 // @Failure 400 {object} error
 // @Failure 500 {object} error
 // @Router /auth/sign-up [post]
 func (h *handler) signUp(ctx *gin.Context) {
 	inputBodySignUp, _ := ctx.Get(inputSignUp)
-	input, _ := inputBodySignUp.(models.SignUpInput)
+	input, _ := inputBodySignUp.(model.SignUpInput)
 
 	if err := input.Validate(); err != nil {
 		logger.LogError(logger.SignUpHandler, err)
@@ -31,7 +31,7 @@ func (h *handler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	if err := h.userService.SignUp(ctx, input); err != nil {
+	if err := h.userService.SignUp(ctx.Request.Context(), input); err != nil {
 		logger.LogError(logger.SignUpHandler, err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "registration is not completed"})
 		return
@@ -45,7 +45,7 @@ func (h *handler) signUp(ctx *gin.Context) {
 // @Description signIn returns JWT token
 // @Accept  json
 // @Produce  json
-// @Param input body models.SignInInput true "sign in info"
+// @Param input body model.SignInInput true "sign in info"
 // @Success 200 {object} string
 // @Failure 400 {object} error
 // @Failure 401 {object} error
@@ -53,7 +53,7 @@ func (h *handler) signUp(ctx *gin.Context) {
 // @Router /auth/sign-in [post]
 func (h *handler) signIn(ctx *gin.Context) {
 	inputBodySignIn, _ := ctx.Get(inputSignIn)
-	input, _ := inputBodySignIn.(models.SignInInput)
+	input, _ := inputBodySignIn.(model.SignInInput)
 
 	if err := input.Validate(); err != nil {
 		logger.LogError(logger.SignInHandler, err)
@@ -61,7 +61,7 @@ func (h *handler) signIn(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := h.userService.SignIn(ctx, input)
+	accessToken, refreshToken, err := h.userService.SignIn(ctx.Request.Context(), input)
 	if err != nil {
 		logger.LogError(logger.SignInHandler, err)
 		if errors.Is(err, service.UserNotFound) {
@@ -94,7 +94,7 @@ func (h *handler) refresh(ctx *gin.Context) {
 		return
 	}
 
-	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx, cookie)
+	accessToken, refreshToken, err := h.userService.RefreshTokens(ctx.Request.Context(), cookie)
 	if err != nil {
 		logger.LogError(logger.RefreshHandler, err)
 		if errors.Is(err, service.UserNotFound) {

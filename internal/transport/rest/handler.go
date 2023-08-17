@@ -1,8 +1,10 @@
 package rest
 
 import (
+	"context"
 	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/internal/service"
+	"github.com/zenorachi/image-box/model"
 	"github.com/zenorachi/image-box/pkg/storage"
 )
 
@@ -15,15 +17,15 @@ const (
 
 type (
 	User interface {
-		SignUp(ctx *gin.Context, input models.SignUpInput) error
-		SignIn(ctx *gin.Context, input models.SignInInput) (string, string, error)
-		ParseToken(ctx *gin.Context, token string) (uint, error)
-		RefreshTokens(ctx *gin.Context, refreshToken string) (string, string, error)
+		SignUp(ctx context.Context, input model.SignUpInput) error
+		SignIn(ctx context.Context, input model.SignInInput) (string, string, error)
+		ParseToken(ctx context.Context, token string) (uint, error)
+		RefreshTokens(ctx context.Context, refreshToken string) (string, string, error)
 	}
 
 	File interface {
-		Upload(ctx *gin.Context, userID uint, input storage.UploadInput) error
-		Get(ctx *gin.Context, userID uint) ([]models.File, error)
+		Upload(ctx context.Context, userID uint, input storage.UploadInput) error
+		Get(ctx context.Context, userID uint) ([]model.File, error)
 	}
 )
 
@@ -63,7 +65,7 @@ type handler struct {
 	fileService File
 }
 
-func NewHandler(users User, files File) Handler {
+func NewHandler(users *service.Users, files *service.Files) Handler {
 	return &handler{
 		userService: users,
 		fileService: files,

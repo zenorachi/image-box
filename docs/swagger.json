@@ -60,7 +60,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SignInInput"
+                            "$ref": "#/definitions/model.SignInInput"
                         }
                     }
                 ],
@@ -106,7 +106,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SignUpInput"
+                            "$ref": "#/definitions/model.SignUpInput"
                         }
                     }
                 ],
@@ -162,7 +162,7 @@
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.File"
+                                "$ref": "#/definitions/model.File"
                             }
                         }
                     },
@@ -244,7 +244,7 @@
         }
     },
     "definitions": {
-        "models.File": {
+        "model.File": {
             "type": "object",
             "properties": {
                 "id": {
@@ -267,7 +267,7 @@
                 }
             }
         },
-        "models.SignInInput": {
+        "model.SignInInput": {
             "type": "object",
             "required": [
                 "login",
@@ -284,7 +284,7 @@
                 }
             }
         },
-        "models.SignUpInput": {
+        "model.SignUpInput": {
             "type": "object",
             "required": [
                 "email",

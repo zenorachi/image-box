@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 func TestFiles_Get(t *testing.T) {
@@ -95,7 +95,7 @@ func TestFiles_Create(t *testing.T) {
 	repo := NewFiles(db)
 
 	type args struct {
-		file models.File
+		file model.File
 	}
 	type mockBehaviour func(args args)
 
@@ -108,7 +108,7 @@ func TestFiles_Create(t *testing.T) {
 		{
 			name: "OK",
 			args: args{
-				models.File{
+				model.File{
 					ID:         1,
 					UserID:     3,
 					Name:       "file",

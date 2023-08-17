@@ -9,7 +9,7 @@ import (
 
 	gin "github.com/gin-gonic/gin"
 	gomock "github.com/golang/mock/gomock"
-	models "github.com/zenorachi/image-box/models"
+	models "github.com/zenorachi/image-box/model"
 	storage "github.com/zenorachi/image-box/pkg/storage"
 )
 

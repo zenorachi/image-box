@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -8,12 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
-func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {
+func (u *Users) ParseToken(ctx context.Context, token string) (uint, error) {
 	tokenParser := func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signign method: %v", token.Header["alg"])
@@ -44,7 +44,7 @@ func (u *Users) ParseToken(ctx *gin.Context, token string) (uint, error) {
 	return uint(id), nil
 }
 
-func (u *Users) generateTokens(ctx *gin.Context, userID uint) (string, string, error) {
+func (u *Users) generateTokens(ctx context.Context, userID uint) (string, string, error) {
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(u.ttl).Unix(),
@@ -61,7 +61,7 @@ func (u *Users) generateTokens(ctx *gin.Context, userID uint) (string, string, e
 		return "", "", err
 	}
 
-	rT := models.CreateToken(userID, refreshToken, time.Now().Add(u.refreshTTL))
+	rT := model.CreateToken(userID, refreshToken, time.Now().Add(u.refreshTTL))
 	if err = u.tokenRepo.Create(ctx, rT); err != nil {
 		return "", "", err
 	}
@@ -69,7 +69,7 @@ func (u *Users) generateTokens(ctx *gin.Context, userID uint) (string, string, e
 	return accessToken, refreshToken, nil
 }
 
-func (u *Users) RefreshTokens(ctx *gin.Context, refreshToken string) (string, string, error) {
+func (u *Users) RefreshTokens(ctx context.Context, refreshToken string) (string, string, error) {
 	token, err := u.tokenRepo.Get(ctx, refreshToken)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

@@ -1,10 +1,10 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 
-	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 type Users struct {
@@ -15,7 +15,7 @@ func NewUsers(db *sql.DB) *Users {
 	return &Users{db: db}
 }
 
-func (u *Users) Create(ctx *gin.Context, user models.User) error {
+func (u *Users) Create(ctx context.Context, user model.User) error {
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  false,
@@ -35,15 +35,15 @@ func (u *Users) Create(ctx *gin.Context, user models.User) error {
 	return tx.Commit()
 }
 
-func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (models.User, error) {
-	var user models.User
+func (u *Users) GetByCredentials(ctx context.Context, login, password string) (model.User, error) {
+	var user model.User
 
 	tx, err := u.db.BeginTx(ctx, &sql.TxOptions{
 		Isolation: sql.LevelSerializable,
 		ReadOnly:  true,
 	})
 	if err != nil {
-		return models.User{}, err
+		return model.User{}, err
 	}
 
 	err = tx.QueryRowContext(ctx, "SELECT id, login, email, password, registered_at FROM users "+
@@ -51,7 +51,7 @@ func (u *Users) GetByCredentials(ctx *gin.Context, login, password string) (mode
 		Scan(&user.ID, &user.Login, &user.Email, &user.Password, &user.RegisteredAt)
 	if err != nil {
 		_ = tx.Rollback()
-		return models.User{}, err
+		return model.User{}, err
 	}
 
 	return user, tx.Commit()

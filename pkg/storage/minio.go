@@ -1,9 +1,9 @@
 package storage
 
 import (
+	"context"
 	"fmt"
 
-	"github.com/gin-gonic/gin"
 	"github.com/minio/minio-go/v7"
 )
 
@@ -21,7 +21,7 @@ func NewProvider(client *minio.Client, bucket, endpoint string) *FileStorage {
 	}
 }
 
-func (fs *FileStorage) Upload(ctx *gin.Context, input UploadInput) (string, error) {
+func (fs *FileStorage) Upload(ctx context.Context, input UploadInput) (string, error) {
 	opts := minio.PutObjectOptions{
 		ContentType:  input.ContentType,
 		UserMetadata: map[string]string{"x-amz-acl": "public-read"},

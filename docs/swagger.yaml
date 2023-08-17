@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  models.File:
+  model.File:
     properties:
       id:
         type: integer
@@ -15,7 +15,7 @@ definitions:
       userID:
         type: integer
     type: object
-  models.SignInInput:
+  model.SignInInput:
     properties:
       login:
         minLength: 6
@@ -27,7 +27,7 @@ definitions:
     - login
     - password
     type: object
-  models.SignUpInput:
+  model.SignUpInput:
     properties:
       email:
         type: string
@@ -81,7 +81,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.SignInInput'
+          $ref: '#/definitions/model.SignInInput'
       produces:
       - application/json
       responses:
@@ -112,7 +112,7 @@ paths:
         name: input
         required: true
         schema:
-          $ref: '#/definitions/models.SignUpInput'
+          $ref: '#/definitions/model.SignUpInput'
       produces:
       - application/json
       responses:
@@ -148,7 +148,7 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/models.File'
+              $ref: '#/definitions/model.File'
             type: array
         "204":
           description: No Content

@@ -18,6 +18,7 @@ require (
 	github.com/swaggo/files v1.0.1
 	github.com/swaggo/gin-swagger v1.6.0
 	github.com/swaggo/swag v1.16.1
+	github.com/zenorachi/url-shortener v0.0.0-20230815215533-123e68f86969
 )
 
 require (

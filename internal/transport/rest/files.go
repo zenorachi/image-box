@@ -2,14 +2,20 @@ package rest
 
 import (
 	"errors"
-	"net/http"
-	"strconv"
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/service"
 	"github.com/zenorachi/image-box/internal/transport/logger"
+	"github.com/zenorachi/image-box/model"
 	"github.com/zenorachi/image-box/pkg/storage"
+	"github.com/zenorachi/url-shortener/pkg/base62"
+	"net/http"
+	"strconv"
+	"strings"
+)
+
+const (
+	uuidLen  = 7
+	pageSize = 3
 )
 
 // @Summary Uploading a file to the storage
@@ -31,7 +37,8 @@ func (h *handler) upload(ctx *gin.Context) {
 	userIdCtx, _ := ctx.Get("userID")
 	userID := userIdCtx.(uint)
 
-	if err := h.fileService.Upload(ctx, userID, uploadInput); err != nil {
+	uploadInput.Name = base62.NewGenerator().GenerateCode(uuidLen) + uploadInput.Name
+	if err := h.fileService.Upload(ctx.Request.Context(), userID, uploadInput); err != nil {
 		logger.LogError(logger.UploadHandler, err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -47,7 +54,7 @@ func (h *handler) upload(ctx *gin.Context) {
 // @Accept json
 // @Produce  json
 // @Param Authorization header string true "Bearer <token>" default("Bearer ")
-// @Success 200 {object} []models.File
+// @Success 200 {object} []model.File
 // @Success 204 {object} string
 // @Failure 400 {object} string
 // @Failure 500 {object} string
@@ -56,13 +63,7 @@ func (h *handler) get(ctx *gin.Context) {
 	userIdCtx, _ := ctx.Get("userID")
 	userID := userIdCtx.(uint)
 
-	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error"})
-	}
-	pageSize := 3
-
-	files, err := h.fileService.Get(ctx, userID)
+	files, err := h.fileService.Get(ctx.Request.Context(), userID)
 	if files == nil {
 		ctx.JSON(http.StatusNoContent, gin.H{"error": service.FilesNotFound})
 		return
@@ -78,10 +79,24 @@ func (h *handler) get(ctx *gin.Context) {
 		return
 	}
 
-	//TODO: DELETE THIS CRINGE
 	for i, file := range files {
 		file.URL = strings.ReplaceAll(file.URL, "minio", "localhost")
 		files[i] = file
+	}
+
+	pagedFiles, err := generatePagination(ctx, files)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "unexpected error"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, pagedFiles)
+}
+
+func generatePagination(ctx *gin.Context, files []model.File) ([]model.File, error) {
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil {
+		return nil, err
 	}
 
 	startIndex := (page - 1) * pageSize
@@ -90,7 +105,5 @@ func (h *handler) get(ctx *gin.Context) {
 		endIndex = len(files)
 	}
 
-	pagedFiles := files[startIndex:endIndex]
-
-	ctx.JSON(http.StatusOK, pagedFiles)
+	return files[startIndex:endIndex], nil
 }

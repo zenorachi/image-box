@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 func TestTokens_Get(t *testing.T) {
@@ -97,7 +97,7 @@ func TestTokens_Create(t *testing.T) {
 	repo := NewTokens(db)
 
 	type args struct {
-		token models.RefreshToken
+		token model.RefreshToken
 	}
 	type mockBehaviour func(args args)
 
@@ -110,7 +110,7 @@ func TestTokens_Create(t *testing.T) {
 		{
 			name: "OK",
 			args: args{
-				token: models.RefreshToken{
+				token: model.RefreshToken{
 					ID:        1,
 					UserID:    2,
 					Token:     "token",

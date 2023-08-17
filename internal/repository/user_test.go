@@ -9,7 +9,7 @@ import (
 	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 func TestUsers_Get(t *testing.T) {
@@ -31,7 +31,7 @@ func TestUsers_Get(t *testing.T) {
 		name          string
 		mockBehaviour mockBehaviour
 		args          args
-		user          models.User
+		user          model.User
 		wantErr       bool
 	}{
 		{
@@ -40,7 +40,7 @@ func TestUsers_Get(t *testing.T) {
 				login:    "login",
 				password: "password",
 			},
-			user: models.User{
+			user: model.User{
 				ID:           1,
 				Login:        "login",
 				Email:        "user-email",
@@ -65,7 +65,7 @@ func TestUsers_Get(t *testing.T) {
 				login:    "hello",
 				password: "world",
 			},
-			user: models.User{},
+			user: model.User{},
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()
 
@@ -104,7 +104,7 @@ func TestUsers_Create(t *testing.T) {
 	repo := NewUsers(db)
 
 	type args struct {
-		user models.User
+		user model.User
 	}
 	type mockBehaviour func(args args)
 
@@ -117,7 +117,7 @@ func TestUsers_Create(t *testing.T) {
 		{
 			name: "OK",
 			args: args{
-				user: models.User{
+				user: model.User{
 					ID:           1,
 					Login:        "user",
 					Email:        "email@go.dev",
@@ -139,7 +139,7 @@ func TestUsers_Create(t *testing.T) {
 		{
 			name: "ERROR",
 			args: args{
-				user: models.User{},
+				user: model.User{},
 			},
 			mockBehaviour: func(args args) {
 				mock.ExpectBegin()

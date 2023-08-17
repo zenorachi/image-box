@@ -9,7 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zenorachi/image-box/internal/transport/logger"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 func (h *handler) CheckBody() gin.HandlerFunc {
@@ -29,7 +29,7 @@ func (h *handler) CheckJSONSignUp() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		requestBody, _ := ctx.Get(requestBody)
 		body := requestBody.([]byte)
-		var input models.SignUpInput
+		var input model.SignUpInput
 		if err := json.Unmarshal(body, &input); err != nil {
 			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
@@ -44,7 +44,7 @@ func (h *handler) CheckJSONSignIn() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		requestBody, _ := ctx.Get(requestBody)
 		body := requestBody.([]byte)
-		var input models.SignInInput
+		var input model.SignInInput
 		if err := json.Unmarshal(body, &input); err != nil {
 			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
@@ -64,7 +64,7 @@ func (h *handler) CheckToken() gin.HandlerFunc {
 			return
 		}
 
-		id, err := h.userService.ParseToken(ctx, token)
+		id, err := h.userService.ParseToken(ctx.Request.Context(), token)
 		if err != nil {
 			logger.LogError(logger.AuthMiddleware, err)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "token is expired"})

@@ -1,12 +1,12 @@
 package service
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 )
 
 var UserNotFound = errors.New("user not found")
@@ -17,13 +17,13 @@ type (
 	}
 
 	UserRepository interface {
-		Create(ctx *gin.Context, user models.User) error
-		GetByCredentials(ctx *gin.Context, login, password string) (models.User, error)
+		Create(ctx context.Context, user model.User) error
+		GetByCredentials(ctx context.Context, login, password string) (model.User, error)
 	}
 
 	TokenRepository interface {
-		Create(ctx *gin.Context, token models.RefreshToken) error
-		Get(ctx *gin.Context, token string) (models.RefreshToken, error)
+		Create(ctx context.Context, token model.RefreshToken) error
+		Get(ctx context.Context, token string) (model.RefreshToken, error)
 	}
 )
 
@@ -47,17 +47,17 @@ func NewUsers(hasher PasswordHasher, repository UserRepository, tokenRepo TokenR
 	}
 }
 
-func (u *Users) SignUp(ctx *gin.Context, input models.SignUpInput) error {
+func (u *Users) SignUp(ctx context.Context, input model.SignUpInput) error {
 	password, err := u.hasher.Hash(input.Password)
 	if err != nil {
 		return err
 	}
 
-	user := models.CreateUser(input.Login, input.Email, password)
+	user := model.CreateUser(input.Login, input.Email, password)
 	return u.repository.Create(ctx, user)
 }
 
-func (u *Users) SignIn(ctx *gin.Context, input models.SignInInput) (string, string, error) {
+func (u *Users) SignIn(ctx context.Context, input model.SignInInput) (string, string, error) {
 	password, err := u.hasher.Hash(input.Password)
 	if err != nil {
 		return "", "", err

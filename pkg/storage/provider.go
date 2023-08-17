@@ -1,9 +1,8 @@
 package storage
 
 import (
+	"context"
 	"io"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UploadInput struct {
@@ -14,7 +13,7 @@ type UploadInput struct {
 }
 
 type Provider interface {
-	Upload(ctx *gin.Context, input UploadInput) (string, error)
+	Upload(ctx context.Context, input UploadInput) (string, error)
 }
 
 func NewUploadInput(file io.Reader, name string, size int64, contentType string) UploadInput {

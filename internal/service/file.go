@@ -1,19 +1,19 @@
 package service
 
 import (
+	"context"
 	"errors"
 	"time"
 
-	"github.com/gin-gonic/gin"
-	"github.com/zenorachi/image-box/models"
+	"github.com/zenorachi/image-box/model"
 	"github.com/zenorachi/image-box/pkg/storage"
 )
 
 var FilesNotFound = errors.New("files not found")
 
 type FileRepository interface {
-	Create(ctx *gin.Context, file models.File) error
-	Get(ctx *gin.Context, userID uint) ([]models.File, error)
+	Create(ctx context.Context, file model.File) error
+	Get(ctx context.Context, userID uint) ([]model.File, error)
 }
 
 type Files struct {
@@ -28,16 +28,16 @@ func NewFiles(repository FileRepository, provider storage.Provider) *Files {
 	}
 }
 
-func (f *Files) Upload(ctx *gin.Context, userID uint, input storage.UploadInput) error {
+func (f *Files) Upload(ctx context.Context, userID uint, input storage.UploadInput) error {
 	url, err := f.provider.Upload(ctx, input)
 	if err != nil {
 		return err
 	}
 
-	file := models.CreateFile(userID, input.Name, url, input.Size, time.Now())
+	file := model.CreateFile(userID, input.Name, url, input.Size, time.Now())
 	return f.repository.Create(ctx, file)
 }
 
-func (f *Files) Get(ctx *gin.Context, userID uint) ([]models.File, error) {
+func (f *Files) Get(ctx context.Context, userID uint) ([]model.File, error) {
 	return f.repository.Get(ctx, userID)
 }
