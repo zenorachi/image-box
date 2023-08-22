@@ -1,5 +1,5 @@
 .SILENT:
-.DEFAULT_GOAL: run
+.DEFAULT_GOAL = run
 .PHONY: build run stop test test-coverage lint
 
 COVER_FILE=cover.out
